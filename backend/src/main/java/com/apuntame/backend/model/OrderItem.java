@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 public class OrderItem {
 
     @EmbeddedId
+    @JsonIgnore
     private OrderItemId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
