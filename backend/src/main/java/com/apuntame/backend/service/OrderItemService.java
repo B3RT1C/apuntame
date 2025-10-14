@@ -28,18 +28,20 @@ public class OrderItemService {
             throw new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId + "," + itemId));
         }
         orderItemRepository.deleteById(id);
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId, itemId)));
     }
 
     public OrderItem getOrderItemById(Integer orderId, Integer itemId) {
         OrderItemId id = new OrderItemId(orderId, itemId);
         return orderItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId + "," + itemId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId, itemId)));
     }
 
     public OrderItem updateOrderItem(Integer orderId, Integer itemId, OrderItem orderItemDetails) {
         OrderItemId id = new OrderItemId(orderId, itemId);
         OrderItem orderItem = orderItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId + "," + itemId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_ITEM_NOT_FOUND, orderId, itemId)));
 
         if (orderItemDetails.getAmount() != null && orderItemDetails.getAmount() > 0) {
             orderItem.setAmount(orderItemDetails.getAmount());
