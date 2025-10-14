@@ -52,11 +52,18 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoints para gestionar OrderItems dentro de un pedido
     @PostMapping("/{orderId}/items")
     public ResponseEntity<OrderItem> addItemToOrder(@PathVariable Integer orderId, @RequestBody OrderItem orderItem) {
-        OrderItem createdOrderItem = orderItemService.addItemToOrder(orderItem);
+        OrderItem createdOrderItem = orderItemService.addItemToOrder(orderId, orderItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrderItem);
+    }
+
+    @PostMapping("/{orderId}/items/batch")
+    public ResponseEntity<List<OrderItem>> addMultipleItemsToOrder(
+            @PathVariable Integer orderId,
+            @RequestBody List<OrderItem> orderItems) {
+        List<OrderItem> createdOrderItems = orderItemService.addMultipleItemsToOrder(orderId, orderItems);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrderItems);
     }
 
     @GetMapping("/{orderId}/items/{itemId}")
@@ -72,8 +79,8 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}/items/{itemId}")
-    public ResponseEntity<Void> removeItemFromOrder(@PathVariable Integer orderId, @PathVariable Integer itemId) {
-        orderItemService.removeItemFromOrder(orderId, itemId);
+    public ResponseEntity<Void> removeItemFromOrder(@PathVariable Integer orderId, @PathVariable Integer itemId, @RequestParam(required = false) Integer amount) {
+        orderItemService.removeItemFromOrder(orderId, itemId, amount);
         return ResponseEntity.noContent().build();
     }
 }
