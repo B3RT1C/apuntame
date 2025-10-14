@@ -1,0 +1,35 @@
+# Ignorar archivos generados por Git en Windows (LF -> CRLF)
+
+*.cmd *.bat
+
+# Ignorar archivo 'nul' problemático en Windows
+
+nul
+
+# Ignorar datos de Docker
+
+postgres_data/ *.log *.tmp docker-compose.override.yml
+
+# Ignorar archivos generados por Maven
+
+target/ .mvn/ *.jar !.mvn/wrapper/maven-wrapper.jar
+
+# Ignorar entornos virtuales o dependencias
+
+node_modules/ pycache/ *.pyc
+
+# Ignorar archivos de configuración local
+
+.env *.local
+
+# Ignorar archivos de IDEs
+
+.idea/ *.iml *.ipr *.iws
+
+# Ignorar builds y artefactos
+
+dist/ build/
+
+# Ignorar archivos de claude
+
+.claude
