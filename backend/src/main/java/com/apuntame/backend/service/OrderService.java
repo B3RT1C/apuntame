@@ -5,7 +5,6 @@ import com.apuntame.backend.exception.InvalidDataException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Item;
 import com.apuntame.backend.model.Order;
-import com.apuntame.backend.model.OrderItem;
 import com.apuntame.backend.model.User;
 import com.apuntame.backend.repository.ItemRepository;
 import com.apuntame.backend.repository.OrderRepository;

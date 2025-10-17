@@ -8,6 +8,7 @@ import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.User;
 import com.apuntame.backend.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +17,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAllUsers(Integer limit) {
@@ -35,6 +38,9 @@ public class UserService {
             throw new DuplicateResourceException(String.format(ErrorMessages.USER_ALREADY_EXISTS, user.getUsername()));
         }
 
+        // Encriptar la contraseña con BCrypt antes de guardar
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         return userRepository.save(user);
     }
 
@@ -48,7 +54,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
 
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-            user.setPassword(userDetails.getPassword());
+            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
 
         if (userDetails.getRole() != null && !userDetails.getRole().isEmpty()) {

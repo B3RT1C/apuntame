@@ -1,0 +1,44 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.remember-me {
+  margin-bottom: 16px;
+  display: block;
+}
+
+.error-message {
+  color: #f44336;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  text-align: center;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+
+  mat-spinner {
+    display: inline-block;
+  }
+}

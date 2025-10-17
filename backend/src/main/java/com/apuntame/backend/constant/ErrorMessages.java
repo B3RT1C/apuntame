@@ -9,6 +9,10 @@ public class ErrorMessages {
     public static final String PASSWORD_EMPTY = "La contraseña no puede estar vacía";
     public static final String ROLE_EMPTY = "El rol no puede estar vacío";
 
+    // Authentication errors
+    public static final String BAD_CREDENTIALS = "Usuario o contraseña incorrectos";
+    public static final String UNAUTHORIZED = "No tienes autorización para acceder a este recurso";
+
     // Item errors
     public static final String ITEM_NOT_FOUND = "Producto no encontrado con id: %s";
     public static final String ITEM_NAME_EMPTY = "El nombre del producto no puede estar vacío";
