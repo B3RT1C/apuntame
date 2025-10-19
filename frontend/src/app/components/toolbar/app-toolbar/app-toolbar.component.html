@@ -1,0 +1,13 @@
+<mat-toolbar color="primary">
+  @if (showMenuButton) {
+    <button mat-icon-button (click)="menuToggled.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+  <span>{{ title }}</span>
+  <span class="spacer"></span>
+  <span>{{ username }}</span>
+  <button mat-icon-button (click)="logoutClicked.emit()">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>

@@ -2,16 +2,16 @@ export class AppRoutes {
   static readonly PATH = {
     LOGIN: 'login',
     HOME: '',
-    ORDERS: 'orders',
-    ITEMS: 'items',
-    ADMIN: 'admin'
+    TAKE_ORDER: 'tomar-pedidos',
+    CHARGE_ORDER: 'cobrar-pedidos',
+    VIEW_ORDERS: 'vista-pedidos'
   };
 
   static readonly ROUTE = {
     LOGIN: '/login',
     HOME: '/',
-    ORDERS: '/orders',
-    ITEMS: '/items',
-    ADMIN: '/admin'
+    TAKE_ORDER: '/tomar-pedidos',
+    CHARGE_ORDER: '/cobrar-pedidos',
+    VIEW_ORDERS: '/vista-pedidos'
   };
 }

@@ -1,0 +1,39 @@
+<div class="app-container">
+  <app-toolbar
+    [title]="isMobile ? 'Apuntame' : 'Apuntame - Sistema de Pedidos'"
+    [username]="username"
+    [showMenuButton]="!isMobile"
+    (menuToggled)="toggleSidenav()"
+    (logoutClicked)="logout()">
+  </app-toolbar>
+
+  <mat-sidenav-container class="sidenav-container">
+    @if (!isMobile) {
+      <mat-sidenav
+        mode="over"
+        [opened]="sidenavOpened">
+        <mat-nav-list>
+          @for (item of menuItems; track item.route) {
+            <mat-list-item (click)="navigateTo(item.route)">
+              <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+              <span matListItemTitle>{{ item.label }}</span>
+            </mat-list-item>
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+    }
+
+    <mat-sidenav-content>
+      <div class="content">
+        <router-outlet></router-outlet>
+      </div>
+
+      @if (isMobile) {
+        <app-bottom-nav
+          [menuItems]="menuItems"
+          (itemClicked)="navigateTo($event)">
+        </app-bottom-nav>
+      }
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
