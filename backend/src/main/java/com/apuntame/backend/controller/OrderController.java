@@ -1,5 +1,8 @@
 package com.apuntame.backend.controller;
 
+import com.apuntame.backend.enums.DeliveryStatus;
+import com.apuntame.backend.enums.PaymentStatus;
+import com.apuntame.backend.enums.PreparationStatus;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.OrderItem;
 import com.apuntame.backend.service.OrderItemService;
@@ -82,5 +85,23 @@ public class OrderController {
     public ResponseEntity<Void> removeItemFromOrder(@PathVariable Integer orderId, @PathVariable Integer itemId, @RequestParam(required = false) Integer amount) {
         orderItemService.removeItemFromOrder(orderId, itemId, amount);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/payment-status")
+    public ResponseEntity<Order> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentStatus paymentStatus) {
+        Order updatedOrder = orderService.updatePaymentStatus(id, paymentStatus);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PatchMapping("/{id}/preparation-status")
+    public ResponseEntity<Order> updatePreparationStatus(@PathVariable Integer id, @RequestBody PreparationStatus preparationStatus) {
+        Order updatedOrder = orderService.updatePreparationStatus(id, preparationStatus);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PatchMapping("/{id}/delivery-status")
+    public ResponseEntity<Order> updateDeliveryStatus(@PathVariable Integer id, @RequestBody DeliveryStatus deliveryStatus) {
+        Order updatedOrder = orderService.updateDeliveryStatus(id, deliveryStatus);
+        return ResponseEntity.ok(updatedOrder);
     }
 }

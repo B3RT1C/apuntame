@@ -22,7 +22,9 @@ public class ErrorMessages {
     public static final String ORDER_NOT_FOUND = "Pedido no encontrado con id: %s";
     //TODO
     //public static final String ORDER_TABLE_EMPTY = "El número de mesa no puede estar vacío";
-    public static final String ORDER_STATE_EMPTY = "El estado del pedido no puede estar vacío";
+    public static final String ORDER_PAYMENT_STATUS_INVALID = "Estado de pago inválido";
+    public static final String ORDER_PREPARATION_STATUS_INVALID = "Estado de preparación inválido";
+    public static final String ORDER_DELIVERY_STATUS_INVALID = "Estado de entrega inválido";
 
     // OrderItem errors
     public static final String ORDER_ITEM_NOT_FOUND = "Producto en pedido no encontrado (Order ID: %s, Item ID: %s)";

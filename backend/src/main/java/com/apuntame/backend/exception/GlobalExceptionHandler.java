@@ -4,6 +4,7 @@ import com.apuntame.backend.constant.ErrorMessages;
 import com.apuntame.backend.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,6 +42,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.name(), ErrorMessages.UNAUTHORIZED);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        String message = ex.getMessage();
+        String errorMessage = ErrorMessages.INTERNAL_ERROR;
+
+        if (message != null) {
+            if (message.contains("PaymentStatus")) {
+                errorMessage = ErrorMessages.ORDER_PAYMENT_STATUS_INVALID;
+            } else if (message.contains("PreparationStatus")) {
+                errorMessage = ErrorMessages.ORDER_PREPARATION_STATUS_INVALID;
+            } else if (message.contains("DeliveryStatus")) {
+                errorMessage = ErrorMessages.ORDER_DELIVERY_STATUS_INVALID;
+            }
+        }
+
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.name(), errorMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(Exception.class)

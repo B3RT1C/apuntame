@@ -1,5 +1,8 @@
 package com.apuntame.backend.model;
 
+import com.apuntame.backend.enums.DeliveryStatus;
+import com.apuntame.backend.enums.PaymentStatus;
+import com.apuntame.backend.enums.PreparationStatus;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +18,29 @@ public class Order {
     @Column(name = "table_number", nullable = false)
     private String table;
 
-    @Column(nullable = false)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "preparation_status", nullable = false)
+    private PreparationStatus preparationStatus = PreparationStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_status", nullable = false)
+    private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
     @Column(name = "creation_date", nullable = false)
     private String creationDate;
+
+    @Column(name = "paid_at")
+    private String paidAt;
+
+    @Column(name = "prepared_at")
+    private String preparedAt;
+
+    @Column(name = "delivered_at")
+    private String deliveredAt;
 
     @ManyToOne
     @JoinColumn(name = "taken_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "user_fk"))
@@ -31,11 +52,13 @@ public class Order {
     public Order() {
     }
 
-    public Order(String table, String state, String creationDate, User takenBy) {
+    public Order(String table, String creationDate, User takenBy) {
         this.table = table;
-        this.state = state;
         this.creationDate = creationDate;
         this.takenBy = takenBy;
+        this.paymentStatus = PaymentStatus.PENDING;
+        this.preparationStatus = PreparationStatus.PENDING;
+        this.deliveryStatus = DeliveryStatus.PENDING;
     }
 
     public Integer getId() {
@@ -54,12 +77,52 @@ public class Order {
         this.table = table;
     }
 
-    public String getState() {
-        return state;
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public PreparationStatus getPreparationStatus() {
+        return preparationStatus;
+    }
+
+    public void setPreparationStatus(PreparationStatus preparationStatus) {
+        this.preparationStatus = preparationStatus;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
+    public String getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(String paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public String getPreparedAt() {
+        return preparedAt;
+    }
+
+    public void setPreparedAt(String preparedAt) {
+        this.preparedAt = preparedAt;
+    }
+
+    public String getDeliveredAt() {
+        return deliveredAt;
+    }
+
+    public void setDeliveredAt(String deliveredAt) {
+        this.deliveredAt = deliveredAt;
     }
 
     public String getCreationDate() {

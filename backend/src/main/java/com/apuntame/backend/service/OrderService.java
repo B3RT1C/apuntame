@@ -1,6 +1,9 @@
 package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
+import com.apuntame.backend.enums.DeliveryStatus;
+import com.apuntame.backend.enums.PaymentStatus;
+import com.apuntame.backend.enums.PreparationStatus;
 import com.apuntame.backend.exception.InvalidDataException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Item;
@@ -12,6 +15,8 @@ import com.apuntame.backend.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -71,8 +76,16 @@ public class OrderService {
             order.setTable(orderDetails.getTable());
         }
 
-        if (orderDetails.getState() != null && !orderDetails.getState().trim().isEmpty()) {
-            order.setState(orderDetails.getState());
+        if (orderDetails.getPaymentStatus() != null) {
+            order.setPaymentStatus(orderDetails.getPaymentStatus());
+        }
+
+        if (orderDetails.getPreparationStatus() != null) {
+            order.setPreparationStatus(orderDetails.getPreparationStatus());
+        }
+
+        if (orderDetails.getDeliveryStatus() != null) {
+            order.setDeliveryStatus(orderDetails.getDeliveryStatus());
         }
 
         if (orderDetails.getTakenBy() != null && orderDetails.getTakenBy().getUsername() != null) {
@@ -91,6 +104,57 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public Order updatePaymentStatus(Integer orderId, PaymentStatus newStatus) {
+        if (newStatus == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+
+        order.setPaymentStatus(newStatus);
+
+        if (newStatus == PaymentStatus.PAID && order.getPaidAt() == null) {
+            order.setPaidAt(getCurrentTimestamp());
+        }
+
+        return orderRepository.save(order);
+    }
+
+    public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus) {
+        if (newStatus == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+
+        order.setPreparationStatus(newStatus);
+
+        if (newStatus == PreparationStatus.READY && order.getPreparedAt() == null) {
+            order.setPreparedAt(getCurrentTimestamp());
+        }
+
+        return orderRepository.save(order);
+    }
+
+    public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus) {
+        if (newStatus == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+
+        order.setDeliveryStatus(newStatus);
+
+        if (newStatus == DeliveryStatus.DELIVERED && order.getDeliveredAt() == null) {
+            order.setDeliveredAt(getCurrentTimestamp());
+        }
+
+        return orderRepository.save(order);
+    }
+
     public void deleteOrder(Integer id) {
         if (!orderRepository.existsById(id)) {
             throw new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id));
@@ -99,14 +163,16 @@ public class OrderService {
     }
 
     private void validateOrder(Order order) {
-        //TODO
-        /*
-        if (order.getTable() == null || order.getTable().trim().isEmpty()) {
-            throw new InvalidDataException(ErrorMessages.ORDER_TABLE_EMPTY);
+        if (order.getPaymentStatus() == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
         }
-        */
-        if (order.getState() == null || order.getState().trim().isEmpty()) {
-            throw new InvalidDataException(ErrorMessages.ORDER_STATE_EMPTY);
+
+        if (order.getPreparationStatus() == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
+        }
+
+        if (order.getDeliveryStatus() == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
         }
     }
 
@@ -114,5 +180,10 @@ public class OrderService {
         if (amount == null || amount <= 0) {
             throw new InvalidDataException(ErrorMessages.ORDER_ITEM_AMOUNT_INVALID);
         }
+    }
+
+    private String getCurrentTimestamp() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.now().format(formatter);
     }
 }

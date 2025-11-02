@@ -38,7 +38,6 @@ public class UserService {
             throw new DuplicateResourceException(String.format(ErrorMessages.USER_ALREADY_EXISTS, user.getUsername()));
         }
 
-        // Encriptar la contraseña con BCrypt antes de guardar
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
