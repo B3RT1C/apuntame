@@ -38,6 +38,10 @@ public class UserService {
             throw new DuplicateResourceException(String.format(ErrorMessages.USER_ALREADY_EXISTS, user.getUsername()));
         }
 
+        if (user.getRole() == null || user.getRole().trim().isEmpty()) {
+            user.setRole("UNASSIGNED");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
@@ -82,9 +86,6 @@ public class UserService {
         }
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             throw new InvalidDataException(ErrorMessages.PASSWORD_EMPTY);
-        }
-        if (user.getRole() == null || user.getRole().trim().isEmpty()) {
-            throw new InvalidDataException(ErrorMessages.ROLE_EMPTY);
         }
     }
 }

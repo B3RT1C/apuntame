@@ -1,4 +1,13 @@
 export class ApiEndpoints {
+  static readonly BASE_URL = (() => {
+    const hostname = window.location.hostname;
+    return `http://${hostname}:8080`;
+  })();
+
+  static readonly WEBSOCKET = {
+    URL: `${ApiEndpoints.BASE_URL}/ws`
+  };
+
   static readonly AUTH = {
     BASE: '/auth',
     LOGIN: '/auth/login'

@@ -1,6 +1,8 @@
 package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
+import com.apuntame.backend.dto.OrderListResponseDTO;
+import com.apuntame.backend.dto.OrderResponseDTO;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
@@ -13,6 +15,7 @@ import com.apuntame.backend.repository.ItemRepository;
 import com.apuntame.backend.repository.OrderRepository;
 import com.apuntame.backend.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,22 +28,27 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final OrderWebSocketService orderWebSocketService;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ItemRepository itemRepository) {
+    public OrderService(OrderRepository orderRepository, UserRepository userRepository, ItemRepository itemRepository, OrderWebSocketService orderWebSocketService) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
+        this.orderWebSocketService = orderWebSocketService;
     }
 
     public List<Order> getAllOrders(Integer limit) {
         if (limit != null && limit > 0) {
-            return orderRepository.findAll(PageRequest.of(0, limit)).getContent();
+            return orderRepository.findAllWithItems(PageRequest.of(0, limit)).getContent();
         }
-        return orderRepository.findAll();
+        return orderRepository.findAllWithItems(Pageable.unpaged()).getContent();
     }
 
     public Order createOrder(Order order) {
         validateOrder(order);
+
+        // Always set creation date from server
+        order.setCreationDate(getCurrentTimestamp());
 
         if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
             order.getOrderItems().forEach(orderItem -> {
@@ -50,7 +58,7 @@ public class OrderService {
 
                 validateOrderItemAmount(orderItem.getAmount());
 
-                int itemId = orderItem.getItem().getId() != null ? orderItem.getItem().getId() : orderItem.getId().getItemId();
+                int itemId = orderItem.getItem().getId();
                 Item attachedItem = itemRepository.findById(itemId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 String.format(ErrorMessages.ITEM_NOT_FOUND, itemId)));
@@ -60,11 +68,13 @@ public class OrderService {
             });
         }
 
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        orderWebSocketService.notifyOrderCreated(savedOrder);
+        return savedOrder;
     }
 
     public Order getOrderById(Integer id) {
-        return orderRepository.findById(id)
+        return orderRepository.findByIdWithItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id)));
     }
 
@@ -109,16 +119,20 @@ public class OrderService {
             throw new InvalidDataException(ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
         }
 
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
 
         order.setPaymentStatus(newStatus);
 
         if (newStatus == PaymentStatus.PAID && order.getPaidAt() == null) {
             order.setPaidAt(getCurrentTimestamp());
+        } else if ((newStatus == PaymentStatus.CANCELLED || newStatus == PaymentStatus.REFUNDED) && order.getPaidAt() == null) {
+            order.setPaidAt(getCurrentTimestamp());
         }
 
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+        orderWebSocketService.notifyOrderUpdated(updatedOrder);
+        return updatedOrder;
     }
 
     public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus) {
@@ -126,7 +140,7 @@ public class OrderService {
             throw new InvalidDataException(ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
         }
 
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
 
         order.setPreparationStatus(newStatus);
@@ -135,7 +149,9 @@ public class OrderService {
             order.setPreparedAt(getCurrentTimestamp());
         }
 
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+        orderWebSocketService.notifyOrderUpdated(updatedOrder);
+        return updatedOrder;
     }
 
     public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus) {
@@ -143,7 +159,7 @@ public class OrderService {
             throw new InvalidDataException(ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
         }
 
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
 
         order.setDeliveryStatus(newStatus);
@@ -152,7 +168,9 @@ public class OrderService {
             order.setDeliveredAt(getCurrentTimestamp());
         }
 
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+        orderWebSocketService.notifyOrderUpdated(updatedOrder);
+        return updatedOrder;
     }
 
     public void deleteOrder(Integer id) {
@@ -174,6 +192,36 @@ public class OrderService {
         if (order.getDeliveryStatus() == null) {
             throw new InvalidDataException(ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
         }
+    }
+
+    public OrderListResponseDTO getAllOrdersWithTimestamp(Integer limit) {
+        List<Order> orders = getAllOrders(limit);
+        return new OrderListResponseDTO(orders, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO createOrderWithTimestamp(Order order) {
+        Order createdOrder = createOrder(order);
+        return new OrderResponseDTO(createdOrder, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO getOrderByIdWithTimestamp(Integer id) {
+        Order order = getOrderById(id);
+        return new OrderResponseDTO(order, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO updatePaymentStatusWithTimestamp(Integer orderId, PaymentStatus newStatus) {
+        Order updatedOrder = updatePaymentStatus(orderId, newStatus);
+        return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO updatePreparationStatusWithTimestamp(Integer orderId, PreparationStatus newStatus) {
+        Order updatedOrder = updatePreparationStatus(orderId, newStatus);
+        return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO updateDeliveryStatusWithTimestamp(Integer orderId, DeliveryStatus newStatus) {
+        Order updatedOrder = updateDeliveryStatus(orderId, newStatus);
+        return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
     private void validateOrderItemAmount(Integer amount) {

@@ -1,7 +1,7 @@
 package com.apuntame.backend.controller;
 
-import com.apuntame.backend.dto.LoginRequest;
 import com.apuntame.backend.dto.LoginResponse;
+import com.apuntame.backend.model.User;
 import com.apuntame.backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +17,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        LoginResponse response = authService.login(loginRequest);
+    public ResponseEntity<LoginResponse> login(@RequestBody User user) {
+        LoginResponse response = authService.login(user);
         return ResponseEntity.ok(response);
     }
 }

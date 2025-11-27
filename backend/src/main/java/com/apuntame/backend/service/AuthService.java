@@ -1,7 +1,6 @@
 package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
-import com.apuntame.backend.dto.LoginRequest;
 import com.apuntame.backend.dto.LoginResponse;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.ActiveToken;
@@ -39,17 +38,17 @@ public class AuthService {
         this.activeTokenRepository = activeTokenRepository;
     }
 
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(User loginUser) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
+                        loginUser.getUsername(),
+                        loginUser.getPassword()
                 )
         );
 
-        User user = userRepository.findById(loginRequest.getUsername())
+        User user = userRepository.findById(loginUser.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(ErrorMessages.USER_NOT_FOUND, loginRequest.getUsername())
+                        String.format(ErrorMessages.USER_NOT_FOUND, loginUser.getUsername())
                 ));
 
         Optional<ActiveToken> existingTokenOpt = activeTokenRepository.findById(user.getUsername());

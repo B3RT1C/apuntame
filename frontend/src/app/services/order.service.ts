@@ -1,9 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ConfigService } from './config.service';
-import { Order, OrderItem } from '../models/order.model';
+import { Order } from '../models/order.model';
+import { OrderItem } from '../models/order-item.model';
 import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../models/order-status.model';
+import { OrderResponse, OrderListResponse } from '../models/order-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,17 +16,21 @@ export class OrderService {
   private config = inject(ConfigService);
   private baseUrl = `${this.config.apiUrl}/orders`;
 
-  getAllOrders(limit?: number): Observable<Order[]> {
+  getAllOrders(limit?: number): Observable<OrderListResponse> {
     const url = limit ? `${this.baseUrl}?limit=${limit}` : this.baseUrl;
-    return this.http.get<Order[]>(url);
+    return this.http.get<OrderListResponse>(url);
   }
 
   getOrderById(id: number): Observable<Order> {
-    return this.http.get<Order>(`${this.baseUrl}/${id}`);
+    return this.http.get<OrderResponse>(`${this.baseUrl}/${id}`).pipe(
+      map(response => response.order)
+    );
   }
 
   createOrder(order: Order): Observable<Order> {
-    return this.http.post<Order>(this.baseUrl, order);
+    return this.http.post<OrderResponse>(this.baseUrl, order).pipe(
+      map(response => response.order)
+    );
   }
 
   updateOrder(id: number, order: Order): Observable<Order> {
@@ -35,15 +42,27 @@ export class OrderService {
   }
 
   updatePaymentStatus(orderId: number, status: PaymentStatus): Observable<Order> {
-    return this.http.patch<Order>(`${this.baseUrl}/${orderId}/payment-status`, status);
+    return this.http.patch<OrderResponse>(`${this.baseUrl}/${orderId}/payment-status`, `"${status}"`, {
+      headers: { 'Content-Type': 'application/json' }
+    }).pipe(
+      map(response => response.order)
+    );
   }
 
   updatePreparationStatus(orderId: number, status: PreparationStatus): Observable<Order> {
-    return this.http.patch<Order>(`${this.baseUrl}/${orderId}/preparation-status`, status);
+    return this.http.patch<OrderResponse>(`${this.baseUrl}/${orderId}/preparation-status`, `"${status}"`, {
+      headers: { 'Content-Type': 'application/json' }
+    }).pipe(
+      map(response => response.order)
+    );
   }
 
   updateDeliveryStatus(orderId: number, status: DeliveryStatus): Observable<Order> {
-    return this.http.patch<Order>(`${this.baseUrl}/${orderId}/delivery-status`, status);
+    return this.http.patch<OrderResponse>(`${this.baseUrl}/${orderId}/delivery-status`, `"${status}"`, {
+      headers: { 'Content-Type': 'application/json' }
+    }).pipe(
+      map(response => response.order)
+    );
   }
 
   addItemToOrder(orderId: number, orderItem: OrderItem): Observable<OrderItem> {

@@ -1,5 +1,6 @@
 package com.apuntame.backend.controller;
 
+import com.apuntame.backend.dto.UserDTO;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.User;
 import com.apuntame.backend.service.UserService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,27 +22,33 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) Integer limit) {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(required = false) Integer limit) {
         List<User> users = userService.getAllUsers(limit);
-        return ResponseEntity.ok(users);
+        List<UserDTO> userDTOs = users.stream()
+                .map(user -> new UserDTO(user.getUsername(), user.getRole()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        UserDTO userDTO = new UserDTO(createdUser.getUsername(), createdUser.getRole());
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+        UserDTO userDTO = new UserDTO(user.getUsername(), user.getRole());
+        return ResponseEntity.ok(userDTO);
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<User> updateUser(@PathVariable String username, @RequestBody User userDetails) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String username, @RequestBody User userDetails) {
         User updatedUser = userService.updateUser(username, userDetails);
-        return ResponseEntity.ok(updatedUser);
+        UserDTO userDTO = new UserDTO(updatedUser.getUsername(), updatedUser.getRole());
+        return ResponseEntity.ok(userDTO);
     }
 
     @DeleteMapping("/{username}")
