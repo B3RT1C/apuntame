@@ -1,0 +1,23 @@
+<div mat-dialog-title>
+  <h2>Pedido #{{ order.id }} - Mesa {{ order.table }}</h2>
+  <button mat-icon-button (click)="close()" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <app-order-summary
+    [orderItems]="order.orderItems"
+    [showTotal]="true"
+    [editable]="false">
+  </app-order-summary>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="warn" (click)="cancelOrder()">
+    Cancelar Pedido
+  </button>
+  <button mat-raised-button color="primary" (click)="payOrder()">
+    Pagar Pedido
+  </button>
+</mat-dialog-actions>

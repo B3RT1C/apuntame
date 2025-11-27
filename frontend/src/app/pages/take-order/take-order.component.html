@@ -1,1 +1,47 @@
-<p>take-order works!</p>
+<div class="container">
+  <mat-form-field>
+    <mat-label>Número de Mesa</mat-label>
+    <input matInput [(ngModel)]="tableNumber" placeholder="Mesa">
+  </mat-form-field>
+
+  <div class="layout">
+    <div class="items-section">
+      @if (loading) {
+        <p>Cargando items...</p>
+      } @else {
+        <div class="items-grid">
+          @for (item of items; track item.id) {
+            <mat-card (click)="addItemToOrder(item)" class="item-card">
+              <mat-card-content>
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-price">{{ item.price | number:'1.2-2' }}€</div>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      }
+    </div>
+
+    <mat-card class="summary">
+      <mat-card-header>
+        <mat-card-title>Pedido Actual</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-order-summary
+          [orderItems]="orderItems"
+          [showTotal]="true"
+          [editable]="true"
+          (addItem)="addItemToOrder($event)"
+          (removeItem)="removeItemFromOrder($event)">
+        </app-order-summary>
+
+        <div class="footer">
+          <button mat-raised-button color="primary" (click)="sendOrder()"
+                  [disabled]="orderItems.length === 0 || !tableNumber">
+            Enviar Pedido
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+mat-card {
+  margin: 20px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.orders-table {
+  width: 100%;
+  margin-top: 20px;
+  min-width: 600px;
+}
+
+.orders-table th {
+  font-weight: bold;
+}
+
+.orders-table td,
+.orders-table th {
+  padding: 12px;
+  white-space: nowrap;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+@media (max-width: 768px) {
+  mat-card {
+    margin: 5px;
+  }
+
+  .table-container {
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+
+  .orders-table {
+    min-width: 800px;
+  }
+
+  .orders-table td,
+  .orders-table th {
+    padding: 8px;
+    font-size: 14px;
+  }
+}

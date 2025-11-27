@@ -1,0 +1,33 @@
+@if (orderItems.length === 0) {
+  <p>No hay items en el pedido</p>
+} @else {
+  <mat-list>
+    @for (orderItem of orderItems; track orderItem.item.id) {
+      <mat-list-item>
+        <div class="order-item-info">
+          <span class="item-name">{{ orderItem.item.name }}</span>
+          <span class="item-price">{{ orderItem.item.price | number:'1.2-2' }}€</span>
+          @if (editable) {
+            <div class="quantity-controls">
+              <button mat-icon-button (click)="onRemoveItem(orderItem)">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span class="quantity">{{ orderItem.amount }}</span>
+              <button mat-icon-button (click)="onAddItem(orderItem.item)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          } @else {
+            <span class="quantity">x{{ orderItem.amount }}</span>
+          }
+        </div>
+      </mat-list-item>
+    }
+  </mat-list>
+}
+
+@if (showTotal) {
+  <div class="total-section">
+    <strong>Total: {{ calculateTotal() | number:'1.2-2' }}€</strong>
+  </div>
+}

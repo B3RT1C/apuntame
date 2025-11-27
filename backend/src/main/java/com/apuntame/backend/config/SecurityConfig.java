@@ -34,7 +34,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.requestMatchers(JwtConstants.LOGIN_ENDPOINT).permitAll().anyRequest().authenticated())
+            .cors(cors -> cors.configure(http))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(JwtConstants.LOGIN_ENDPOINT).permitAll()
+                .requestMatchers("/ws/**").permitAll()  // WebSocket endpoint public, token verification in WebSocketAuthInterceptor (frontend)
+                .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

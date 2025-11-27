@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>Configuración de Pedidos</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <mat-tab label="Filtro">
+      <div class="tab-content">
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Pago</mat-label>
+          <mat-select [(ngModel)]="filterConfig.paymentStatus">
+            <mat-option *ngFor="let option of paymentStatusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Preparación</mat-label>
+          <mat-select [(ngModel)]="filterConfig.preparationStatus">
+            <mat-option *ngFor="let option of preparationStatusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Entrega</mat-label>
+          <mat-select [(ngModel)]="filterConfig.deliveryStatus">
+            <mat-option *ngFor="let option of deliveryStatusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Vista">
+      <div class="tab-content">
+        <div class="checkbox-list">
+          <mat-checkbox [(ngModel)]="viewConfig.showTable">
+            Mostrar mesa
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="viewConfig.showTotal">
+            Mostrar total
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="viewConfig.showPaymentStatus">
+            Mostrar estado de pago
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="viewConfig.showPreparationStatus">
+            Mostrar estado de preparación
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="viewConfig.showDeliveryStatus">
+            Mostrar estado de entrega
+          </mat-checkbox>
+          <mat-checkbox [(ngModel)]="viewConfig.showOrderItems">
+            Mostrar items del pedido
+          </mat-checkbox>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onApply()">Aplicar</button>
+</mat-dialog-actions>

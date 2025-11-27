@@ -1,0 +1,29 @@
+[mat-dialog-title] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 16px 24px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .close-button {
+    margin-left: auto;
+  }
+}
+
+mat-dialog-content {
+  padding: 0 24px 24px 24px;
+  min-height: 200px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  gap: 8px;
+}

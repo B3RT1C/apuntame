@@ -1,0 +1,277 @@
+.view-orders-container {
+  padding: 20px;
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .settings-button {
+      color: rgba(0, 0, 0, 0.54);
+      transition: color 0.2s;
+
+      &:hover {
+        color: #1976d2;
+      }
+    }
+  }
+
+  .loading-message,
+  .empty-message {
+    text-align: center;
+    padding: 40px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 16px;
+  }
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-auto-rows: min-content;
+  align-items: start;
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+.order-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: fit-content;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-card-header {
+    padding: 16px 16px 8px 16px;
+  }
+
+  mat-card-content {
+    padding: 8px 16px 16px 16px;
+  }
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .order-id {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1976d2;
+  }
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+
+  .order-table {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.timer-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    transition: color 0.3s ease;
+
+    &.timer-icon-green {
+      color: #2e7d32;
+    }
+
+    &.timer-icon-yellow {
+      color: #f57c00;
+    }
+
+    &.timer-icon-red {
+      color: #c62828;
+    }
+  }
+}
+
+.total-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+  .total-label {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .total-amount {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2e7d32;
+  }
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-label {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      min-width: 80px;
+      font-weight: 500;
+    }
+
+    .status-timestamp {
+      font-size: 11px;
+      color: rgba(0, 0, 0, 0.5);
+      font-style: italic;
+      margin-left: 4px;
+    }
+  }
+
+  mat-chip {
+    font-size: 10px;
+    min-height: 20px;
+    height: 20px;
+    padding: 0 6px;
+
+    &.payment-pending {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &.payment-paid {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &.payment-refunded,
+    &.payment-cancelled {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    &.preparation-pending {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &.preparation-ready {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &.preparation-cancelled {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    &.delivery-pending {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &.delivery-delivered {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &.delivery-cancelled {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  }
+}
+
+.items-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+
+  .item-name {
+    flex: 1;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .item-quantity {
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 500;
+  }
+
+  .item-price {
+    color: #2e7d32;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
+  }
+}
+
+@media (max-width: 768px) {
+  .view-orders-container {
+    padding: 10px;
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .orders-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

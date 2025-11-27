@@ -1,0 +1,52 @@
+mat-list-item {
+  height: auto !important;
+  padding: 8px 4px !important;
+}
+
+.order-item-info {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+
+  .item-name {
+    flex: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-price {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .quantity {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 30px;
+    text-align: right;
+  }
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .quantity {
+    min-width: 20px;
+    text-align: center;
+    font-size: 16px;
+  }
+}
+
+.total-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  font-size: 18px;
+}

@@ -23,8 +23,7 @@ mat-list-item {
 
 .content {
   padding: 24px;
-  height: 100%;
-  overflow: auto;
+  min-height: 100%;
 
   @media (max-width: 959px) {
     padding: 16px;

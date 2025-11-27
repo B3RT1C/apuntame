@@ -1,1 +1,108 @@
-<p>view-orders works!</p>
+<div class="view-orders-container">
+  <div class="header-container">
+    <h1>Vista de Pedidos</h1>
+    <button mat-icon-button (click)="openFilterDialog()" class="settings-button">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </div>
+
+  @if (loading) {
+    <p class="loading-message">Cargando pedidos...</p>
+  } @else if (orders.length === 0) {
+    <p class="empty-message">No hay pedidos pendientes.</p>
+  } @else {
+    <div class="orders-grid">
+      @for (order of orders; track order.id) {
+        <mat-card class="order-card" (click)="onOrderClick(order)">
+          <mat-card-header>
+            <mat-card-title>
+              <div class="order-header">
+                <span class="order-id">Pedido #{{ order.id }}</span>
+              </div>
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="order-info">
+              <div class="order-meta">
+                @if (viewConfig.showTable) {
+                  <span class="order-table">Mesa {{ order.table }}</span>
+                }
+                <div class="timer-section">
+                  <mat-icon [class]="'timer-icon-' + getTimerColor(order.id!)">
+                    {{ isOrderCompleted(order) ? 'crop_square' : 'schedule' }}
+                  </mat-icon>
+                  <app-order-timer
+                    [creationDate]="order.creationDate"
+                    [paidAt]="order.paidAt"
+                    [preparedAt]="order.preparedAt"
+                    [deliveredAt]="order.deliveredAt"
+                    (colorChange)="onTimerColorChange(order.id!, $event)">
+                  </app-order-timer>
+                </div>
+              </div>
+
+              @if (viewConfig.showOrderItems && order.orderItems && order.orderItems.length > 0) {
+                <div class="items-section">
+                  <h4>Items:</h4>
+                  <div class="items-list">
+                    @for (item of order.orderItems; track item.item.id) {
+                      <div class="item-row">
+                        <span class="item-name">{{ item.item.name }}</span>
+                        <span class="item-quantity">x{{ item.amount }}</span>
+                        <span class="item-price">{{ item.item.price * item.amount | number:'1.2-2' }}€</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (viewConfig.showTotal) {
+                <div class="total-section">
+                  <span class="total-label">Total:</span>
+                  <span class="total-amount">{{ calculateTotal(order) | number:'1.2-2' }}€</span>
+                </div>
+              }
+
+              <div class="status-section">
+                @if (viewConfig.showPaymentStatus) {
+                  <div class="status-item">
+                    <span class="status-label">Pago:</span>
+                    <mat-chip [class]="'status-chip payment-' + order.paymentStatus.toLowerCase()">
+                      {{ order.paymentStatus | paymentStatus }}
+                    </mat-chip>
+                    @if (order.paidAt) {
+                      <span class="status-timestamp">{{ calculateDuration(order, order.paidAt) }}</span>
+                    }
+                  </div>
+                }
+                @if (viewConfig.showPreparationStatus) {
+                  <div class="status-item">
+                    <span class="status-label">Preparación:</span>
+                    <mat-chip [class]="'status-chip preparation-' + order.preparationStatus.toLowerCase()">
+                      {{ order.preparationStatus | preparationStatus }}
+                    </mat-chip>
+                    @if (order.preparedAt) {
+                      <span class="status-timestamp">{{ calculateDuration(order, order.preparedAt) }}</span>
+                    }
+                  </div>
+                }
+                @if (viewConfig.showDeliveryStatus) {
+                  <div class="status-item">
+                    <span class="status-label">Entrega:</span>
+                    <mat-chip [class]="'status-chip delivery-' + order.deliveryStatus.toLowerCase()">
+                      {{ order.deliveryStatus | deliveryStatus }}
+                    </mat-chip>
+                    @if (order.deliveredAt) {
+                      <span class="status-timestamp">{{ calculateDuration(order, order.deliveredAt) }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

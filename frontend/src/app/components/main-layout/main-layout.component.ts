@@ -57,6 +57,7 @@ export class MainLayoutComponent {
 
   navigateTo(route: string): void {
     this.router.navigate([route]);
+    this.sidenavOpened = false;
   }
 
   logout(): void {
