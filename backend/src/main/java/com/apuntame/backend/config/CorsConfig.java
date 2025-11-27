@@ -31,8 +31,8 @@ public class CorsConfig {
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
         config.addAllowedMethod("DELETE");
-        //config.addAllowedMethod("OPTIONS");
-        //config.addAllowedMethod("PATCH");
+        config.addAllowedMethod("OPTIONS");
+        config.addAllowedMethod("PATCH");
 
         // Headers expuestos - Headers que el frontend puede leer de la respuesta
         config.addExposedHeader("Authorization");
