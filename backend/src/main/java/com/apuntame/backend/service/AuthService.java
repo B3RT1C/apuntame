@@ -39,39 +39,62 @@ public class AuthService {
     }
 
     public LoginResponse login(User loginUser) {
-        Authentication authentication = authenticationManager.authenticate(
+        authenticateUser(loginUser);
+        User user = findUserByUsername(loginUser.getUsername());
+        String token = getOrCreateToken(user.getUsername());
+
+        return new LoginResponse(token, user.getUsername(), user.getRole());
+    }
+
+    private void authenticateUser(User loginUser) {
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginUser.getUsername(),
                         loginUser.getPassword()
                 )
         );
+    }
 
-        User user = userRepository.findById(loginUser.getUsername())
+    private User findUserByUsername(String username) {
+        return userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(ErrorMessages.USER_NOT_FOUND, loginUser.getUsername())
+                        String.format(ErrorMessages.USER_NOT_FOUND, username)
                 ));
+    }
 
-        Optional<ActiveToken> existingTokenOpt = activeTokenRepository.findById(user.getUsername());
+    private String getOrCreateToken(String username) {
+        Optional<ActiveToken> existingTokenOpt = activeTokenRepository.findById(username);
 
-        String token;
         if (existingTokenOpt.isPresent()) {
-            ActiveToken existingToken = existingTokenOpt.get();
-
-            if (!existingToken.isExpired()) {
-                token = existingToken.getToken();
-            } else {
-                token = jwtUtil.generateToken(user.getUsername());
-                existingToken.setToken(token);
-                existingToken.setExpiresAt(LocalDateTime.now().plusSeconds(jwtExpiration / 1000));
-                activeTokenRepository.save(existingToken);
-            }
+            return handleExistingToken(existingTokenOpt.get());
         } else {
-            token = jwtUtil.generateToken(user.getUsername());
-            LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(jwtExpiration / 1000);
-            ActiveToken activeToken = new ActiveToken(user.getUsername(), token, expiresAt);
-            activeTokenRepository.save(activeToken);
+            return createNewToken(username);
         }
+    }
 
-        return new LoginResponse(token, user.getUsername(), user.getRole());
+    private String handleExistingToken(ActiveToken existingToken) {
+        if (!existingToken.isExpired()) {
+            return existingToken.getToken();
+        }
+        return refreshToken(existingToken);
+    }
+
+    private String refreshToken(ActiveToken existingToken) {
+        String newToken = jwtUtil.generateToken(existingToken.getUsername());
+        existingToken.setToken(newToken);
+        existingToken.setExpiresAt(calculateExpirationTime());
+        activeTokenRepository.save(existingToken);
+        return newToken;
+    }
+
+    private String createNewToken(String username) {
+        String token = jwtUtil.generateToken(username);
+        ActiveToken activeToken = new ActiveToken(username, token, calculateExpirationTime());
+        activeTokenRepository.save(activeToken);
+        return token;
+    }
+
+    private LocalDateTime calculateExpirationTime() {
+        return LocalDateTime.now().plusSeconds(jwtExpiration / 1000);
     }
 }

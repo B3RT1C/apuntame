@@ -29,15 +29,55 @@ export class TimeSyncService {
 
   getServerTimeString(): string {
     const serverTime = this.getServerTime();
+    return this.formatDateTime(serverTime);
+  }
 
-    const year = serverTime.getFullYear();
-    const month = String(serverTime.getMonth() + 1).padStart(2, '0');
-    const day = String(serverTime.getDate()).padStart(2, '0');
-    const hours = String(serverTime.getHours()).padStart(2, '0');
-    const minutes = String(serverTime.getMinutes()).padStart(2, '0');
-    const seconds = String(serverTime.getSeconds()).padStart(2, '0');
+  formatElapsedTime(startTimestamp: string, endTimestamp?: string): string {
+    const startDate = new Date(startTimestamp.replace(' ', 'T'));
+    const endDate = endTimestamp
+      ? new Date(endTimestamp.replace(' ', 'T'))
+      : this.getServerTime();
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const diffMs = endDate.getTime() - startDate.getTime();
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    if (totalMinutes >= 60) {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
+    }
+
+    return `${this.padZero(totalMinutes)}:${this.padZero(seconds)}`;
+  }
+
+  parseTimestamp(timestamp: string): Date {
+    return new Date(timestamp.replace(' ', 'T'));
+  }
+
+  private formatDateTime(date: Date): string {
+    const datePart = this.formatDate(date);
+    const timePart = this.formatTime(date);
+    return `${datePart} ${timePart}`;
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = this.padZero(date.getMonth() + 1);
+    const day = this.padZero(date.getDate());
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatTime(date: Date): string {
+    const hours = this.padZero(date.getHours());
+    const minutes = this.padZero(date.getMinutes());
+    const seconds = this.padZero(date.getSeconds());
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  private padZero(num: number): string {
+    return String(num).padStart(2, '0');
   }
 
   reset(): void {

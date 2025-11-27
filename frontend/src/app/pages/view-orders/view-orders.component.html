@@ -72,7 +72,7 @@
                       {{ order.paymentStatus | paymentStatus }}
                     </mat-chip>
                     @if (order.paidAt) {
-                      <span class="status-timestamp">{{ calculateDuration(order, order.paidAt) }}</span>
+                      <span class="status-timestamp">{{ formatStateTimestamp(order, order.paidAt) }}</span>
                     }
                   </div>
                 }
@@ -83,7 +83,7 @@
                       {{ order.preparationStatus | preparationStatus }}
                     </mat-chip>
                     @if (order.preparedAt) {
-                      <span class="status-timestamp">{{ calculateDuration(order, order.preparedAt) }}</span>
+                      <span class="status-timestamp">{{ formatStateTimestamp(order, order.preparedAt) }}</span>
                     }
                   </div>
                 }
@@ -94,7 +94,7 @@
                       {{ order.deliveryStatus | deliveryStatus }}
                     </mat-chip>
                     @if (order.deliveredAt) {
-                      <span class="status-timestamp">{{ calculateDuration(order, order.deliveredAt) }}</span>
+                      <span class="status-timestamp">{{ formatStateTimestamp(order, order.deliveredAt) }}</span>
                     }
                   </div>
                 }

@@ -76,9 +76,12 @@ export class OrderTimerComponent implements OnInit, OnDestroy {
   }
 
   private parseDate(dateString: string): Date | null {
-    const dateStr = dateString.includes('T') ? dateString : dateString.replace(' ', 'T');
-    const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? null : date;
+    try {
+      const date = this.timeSyncService.parseTimestamp(dateString);
+      return isNaN(date.getTime()) ? null : date;
+    } catch {
+      return null;
+    }
   }
 
   private calculateTimeDifference(createdDate: Date, isFullyCompleted: boolean): number {
@@ -106,10 +109,18 @@ export class OrderTimerComponent implements OnInit, OnDestroy {
 
   private updateTimerDisplay(diffMs: number): void {
     const diffMinutes = Math.floor(diffMs / 60000);
-    const diffSeconds = Math.floor((diffMs % 60000) / 1000);
-
     this.updateColorClass(diffMinutes);
-    this.formatElapsedTime(diffMinutes, diffSeconds);
+
+    const startTime = new Date(0);
+    const endTime = new Date(diffMs);
+    this.elapsedTime = this.timeSyncService.formatElapsedTime(
+      this.formatTimestampString(startTime),
+      this.formatTimestampString(endTime)
+    );
+  }
+
+  private formatTimestampString(date: Date): string {
+    return date.toISOString().replace('T', ' ').substring(0, 19);
   }
 
   private updateColorClass(diffMinutes: number): void {
@@ -126,16 +137,6 @@ export class OrderTimerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private formatElapsedTime(diffMinutes: number, diffSeconds: number): void {
-    if (diffMinutes >= 60) {
-      const hours = Math.floor(diffMinutes / 60);
-      const minutes = diffMinutes % 60;
-      this.elapsedTime = `${this.padZero(hours)}:${this.padZero(minutes)}:${this.padZero(diffSeconds)}`;
-    } else {
-      this.elapsedTime = `${this.padZero(diffMinutes)}:${this.padZero(diffSeconds)}`;
-    }
-  }
-
   private resetTimer(): void {
     this.elapsedTime = '00:00';
     this.setTimerClass('green');
@@ -146,9 +147,5 @@ export class OrderTimerComponent implements OnInit, OnDestroy {
       this.timerClass = color;
       setTimeout(() => this.colorChange.emit(color), 0);
     }
-  }
-
-  private padZero(num: number): string {
-    return num.toString().padStart(2, '0');
   }
 }

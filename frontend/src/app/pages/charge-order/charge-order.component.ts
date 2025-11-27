@@ -4,6 +4,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OrderService } from '../../services/order.service';
+import { OrderCalculationService } from '../../services/order-calculation.service';
 import { Order } from '../../models/order.model';
 import { PaymentStatus } from '../../models/order-status.model';
 import { ChargeOrderDialogComponent } from '../../components/charge-order-dialog/charge-order-dialog.component';
@@ -26,6 +27,7 @@ export class ChargeOrderComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    private orderCalculation: OrderCalculationService,
     private dialog: MatDialog
   ) {}
 
@@ -48,12 +50,7 @@ export class ChargeOrderComponent implements OnInit {
   }
 
   calculateTotal(order: Order): number {
-    if (!order.orderItems || order.orderItems.length === 0) {
-      return 0;
-    }
-    return order.orderItems.reduce((total, orderItem) => {
-      return total + (orderItem.item.price * orderItem.amount);
-    }, 0);
+    return this.orderCalculation.calculateTotal(order);
   }
 
   selectOrder(order: Order): void {

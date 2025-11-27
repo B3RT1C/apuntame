@@ -35,33 +35,52 @@ public class OrderWebSocketService {
     private OrderEventDTO convertToDTO(Order order, OrderEventDTO.EventType eventType) {
         OrderEventDTO dto = new OrderEventDTO();
         dto.setEventType(eventType);
+
+        mapBasicOrderFields(order, dto);
+        mapOrderDates(order, dto);
+        mapTakenByUser(order, dto);
+        mapOrderItems(order, dto);
+
+        return dto;
+    }
+
+    private void mapBasicOrderFields(Order order, OrderEventDTO dto) {
         dto.setId(order.getId());
         dto.setTable(order.getTable());
         dto.setPaymentStatus(order.getPaymentStatus());
         dto.setPreparationStatus(order.getPreparationStatus());
         dto.setDeliveryStatus(order.getDeliveryStatus());
+    }
+
+    private void mapOrderDates(Order order, OrderEventDTO dto) {
         dto.setCreationDate(order.getCreationDate());
         dto.setPaidAt(order.getPaidAt());
         dto.setPreparedAt(order.getPreparedAt());
         dto.setDeliveredAt(order.getDeliveredAt());
+    }
 
+    private void mapTakenByUser(Order order, OrderEventDTO dto) {
         if (order.getTakenBy() != null) {
             dto.setTakenBy(order.getTakenBy().getUsername());
         }
+    }
 
+    private void mapOrderItems(Order order, OrderEventDTO dto) {
         if (order.getOrderItems() != null) {
             dto.setOrderItems(
                 order.getOrderItems().stream()
-                        .map(orderItem -> new OrderEventDTO.OrderItemDTO(
-                                orderItem.getItem().getId(),
-                                orderItem.getItem().getName(),
-                                orderItem.getItem().getPrice(),
-                                orderItem.getAmount()
-                        ))
+                        .map(this::convertToOrderItemDTO)
                         .collect(Collectors.toList())
             );
         }
+    }
 
-        return dto;
+    private OrderEventDTO.OrderItemDTO convertToOrderItemDTO(com.apuntame.backend.model.OrderItem orderItem) {
+        return new OrderEventDTO.OrderItemDTO(
+                orderItem.getItem().getId(),
+                orderItem.getItem().getName(),
+                orderItem.getItem().getPrice(),
+                orderItem.getAmount()
+        );
     }
 }

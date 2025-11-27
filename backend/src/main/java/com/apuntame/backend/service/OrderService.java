@@ -10,6 +10,7 @@ import com.apuntame.backend.exception.InvalidDataException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Item;
 import com.apuntame.backend.model.Order;
+import com.apuntame.backend.model.OrderItem;
 import com.apuntame.backend.model.User;
 import com.apuntame.backend.repository.ItemRepository;
 import com.apuntame.backend.repository.OrderRepository;
@@ -46,31 +47,39 @@ public class OrderService {
 
     public Order createOrder(Order order) {
         validateOrder(order);
-
-        // Always set creation date from server
         order.setCreationDate(getCurrentTimestamp());
-
-        if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
-            order.getOrderItems().forEach(orderItem -> {
-                if (orderItem.getItem() == null || orderItem.getItem().getId() == null) {
-                    throw new InvalidDataException(ErrorMessages.ORDER_ITEM_NULL);
-                }
-
-                validateOrderItemAmount(orderItem.getAmount());
-
-                int itemId = orderItem.getItem().getId();
-                Item attachedItem = itemRepository.findById(itemId)
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                String.format(ErrorMessages.ITEM_NOT_FOUND, itemId)));
-                orderItem.setItem(attachedItem);
-
-                orderItem.setOrder(order);
-            });
-        }
+        processOrderItems(order);
 
         Order savedOrder = orderRepository.save(order);
         orderWebSocketService.notifyOrderCreated(savedOrder);
         return savedOrder;
+    }
+
+    private void processOrderItems(Order order) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
+            return;
+        }
+
+        order.getOrderItems().forEach(orderItem -> {
+            validateOrderItem(orderItem);
+            attachItemToOrderItem(orderItem);
+            orderItem.setOrder(order);
+        });
+    }
+
+    private void validateOrderItem(OrderItem orderItem) {
+        if (orderItem.getItem() == null || orderItem.getItem().getId() == null) {
+            throw new InvalidDataException(ErrorMessages.ORDER_ITEM_NULL);
+        }
+        validateOrderItemAmount(orderItem.getAmount());
+    }
+
+    private void attachItemToOrderItem(OrderItem orderItem) {
+        int itemId = orderItem.getItem().getId();
+        Item attachedItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format(ErrorMessages.ITEM_NOT_FOUND, itemId)));
+        orderItem.setItem(attachedItem);
     }
 
     public Order getOrderById(Integer id) {
@@ -82,92 +91,110 @@ public class OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id)));
 
+        updateTableIfPresent(order, orderDetails);
+        updateStatusFieldsIfPresent(order, orderDetails);
+        updateTakenByIfPresent(order, orderDetails);
+        validateOrderItemsIfPresent(orderDetails);
+
+        return orderRepository.save(order);
+    }
+
+    private void updateTableIfPresent(Order order, Order orderDetails) {
         if (orderDetails.getTable() != null && !orderDetails.getTable().trim().isEmpty()) {
             order.setTable(orderDetails.getTable());
         }
+    }
 
+    private void updateStatusFieldsIfPresent(Order order, Order orderDetails) {
         if (orderDetails.getPaymentStatus() != null) {
             order.setPaymentStatus(orderDetails.getPaymentStatus());
         }
-
         if (orderDetails.getPreparationStatus() != null) {
             order.setPreparationStatus(orderDetails.getPreparationStatus());
         }
-
         if (orderDetails.getDeliveryStatus() != null) {
             order.setDeliveryStatus(orderDetails.getDeliveryStatus());
         }
+    }
 
+    private void updateTakenByIfPresent(Order order, Order orderDetails) {
         if (orderDetails.getTakenBy() != null && orderDetails.getTakenBy().getUsername() != null) {
             User attachedUser = userRepository.findById(orderDetails.getTakenBy().getUsername())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             String.format(ErrorMessages.USER_NOT_FOUND, orderDetails.getTakenBy().getUsername())));
             order.setTakenBy(attachedUser);
         }
+    }
 
+    private void validateOrderItemsIfPresent(Order orderDetails) {
         if (orderDetails.getOrderItems() != null && !orderDetails.getOrderItems().isEmpty()) {
-            orderDetails.getOrderItems().forEach(orderItem -> {
-                validateOrderItemAmount(orderItem.getAmount());
-            });
+            orderDetails.getOrderItems().forEach(orderItem ->
+                validateOrderItemAmount(orderItem.getAmount())
+            );
         }
-
-        return orderRepository.save(order);
     }
 
     public Order updatePaymentStatus(Integer orderId, PaymentStatus newStatus) {
-        if (newStatus == null) {
-            throw new InvalidDataException(ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
-        }
-
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+        validateStatusNotNull(newStatus, ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
+        Order order = findOrderById(orderId);
 
         order.setPaymentStatus(newStatus);
+        setPaymentTimestampIfNeeded(order, newStatus);
 
-        if (newStatus == PaymentStatus.PAID && order.getPaidAt() == null) {
-            order.setPaidAt(getCurrentTimestamp());
-        } else if ((newStatus == PaymentStatus.CANCELLED || newStatus == PaymentStatus.REFUNDED) && order.getPaidAt() == null) {
-            order.setPaidAt(getCurrentTimestamp());
-        }
-
-        Order updatedOrder = orderRepository.save(order);
-        orderWebSocketService.notifyOrderUpdated(updatedOrder);
-        return updatedOrder;
+        return saveAndNotifyUpdate(order);
     }
 
     public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus) {
-        if (newStatus == null) {
-            throw new InvalidDataException(ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
-        }
-
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+        validateStatusNotNull(newStatus, ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
+        Order order = findOrderById(orderId);
 
         order.setPreparationStatus(newStatus);
+        setPreparationTimestampIfNeeded(order, newStatus);
 
-        if (newStatus == PreparationStatus.READY && order.getPreparedAt() == null) {
-            order.setPreparedAt(getCurrentTimestamp());
-        }
-
-        Order updatedOrder = orderRepository.save(order);
-        orderWebSocketService.notifyOrderUpdated(updatedOrder);
-        return updatedOrder;
+        return saveAndNotifyUpdate(order);
     }
 
     public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus) {
-        if (newStatus == null) {
-            throw new InvalidDataException(ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
-        }
-
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+        validateStatusNotNull(newStatus, ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
+        Order order = findOrderById(orderId);
 
         order.setDeliveryStatus(newStatus);
+        setDeliveryTimestampIfNeeded(order, newStatus);
 
+        return saveAndNotifyUpdate(order);
+    }
+
+    private void validateStatusNotNull(Object status, String errorMessage) {
+        if (status == null) {
+            throw new InvalidDataException(errorMessage);
+        }
+    }
+
+    private Order findOrderById(Integer orderId) {
+        return orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, orderId)));
+    }
+
+    private void setPaymentTimestampIfNeeded(Order order, PaymentStatus newStatus) {
+        if ((newStatus == PaymentStatus.PAID || newStatus == PaymentStatus.CANCELLED ||
+             newStatus == PaymentStatus.REFUNDED) && order.getPaidAt() == null) {
+            order.setPaidAt(getCurrentTimestamp());
+        }
+    }
+
+    private void setPreparationTimestampIfNeeded(Order order, PreparationStatus newStatus) {
+        if (newStatus == PreparationStatus.READY && order.getPreparedAt() == null) {
+            order.setPreparedAt(getCurrentTimestamp());
+        }
+    }
+
+    private void setDeliveryTimestampIfNeeded(Order order, DeliveryStatus newStatus) {
         if (newStatus == DeliveryStatus.DELIVERED && order.getDeliveredAt() == null) {
             order.setDeliveredAt(getCurrentTimestamp());
         }
+    }
 
+    private Order saveAndNotifyUpdate(Order order) {
         Order updatedOrder = orderRepository.save(order);
         orderWebSocketService.notifyOrderUpdated(updatedOrder);
         return updatedOrder;

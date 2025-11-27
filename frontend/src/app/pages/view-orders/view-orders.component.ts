@@ -8,6 +8,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OrderService } from '../../services/order.service';
 import { WebsocketService, OrderEventDTO } from '../../services/websocket.service';
 import { TimeSyncService } from '../../services/time-sync.service';
+import { OrderMapperService } from '../../services/order-mapper.service';
+import { OrderCalculationService } from '../../services/order-calculation.service';
 import { Order } from '../../models/order.model';
 import { DeliveryStatus } from '../../models/order-status.model';
 import { OrderTimerComponent } from '../../components/order-timer/order-timer.component';
@@ -58,6 +60,8 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private websocketService: WebsocketService,
     private timeSyncService: TimeSyncService,
+    private orderMapper: OrderMapperService,
+    private orderCalculation: OrderCalculationService,
     private dialog: MatDialog
   ) {}
 
@@ -79,10 +83,10 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.timeSyncService.syncWithServer(response.serverTimestamp);
 
-        this.allOrders = response.orders.sort((a, b) => {
-          const dateA = new Date(a.creationDate!.replace(' ', 'T'));
-          const dateB = new Date(b.creationDate!.replace(' ', 'T'));
-          return dateA.getTime() - dateB.getTime(); // Oldest first
+        this.allOrders = response.orders.sort((orderA, orderB) => {
+          const creationDateA = this.timeSyncService.parseTimestamp(orderA.creationDate!);
+          const creationDateB = this.timeSyncService.parseTimestamp(orderB.creationDate!);
+          return creationDateA.getTime() - creationDateB.getTime();
         });
         this.applyFilters();
         this.loading = false;
@@ -108,87 +112,43 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
 
   handleOrderEvent(event: OrderEventDTO): void {
     if (event.eventType === 'CREATED') {
-      const newOrder = this.convertDTOToOrder(event);
-      this.allOrders.push(newOrder);
-      this.applyFilters();
-
+      this.handleOrderCreated(event);
     } else if (event.eventType === 'UPDATED') {
-      const index = this.allOrders.findIndex(o => o.id === event.id);
-
-      if (index !== -1) {
-        this.allOrders[index] = this.convertDTOToOrder(event);
-        this.applyFilters();
-        if (event.deliveryStatus === 'DELIVERED') {
-          this.orderTimerColors.delete(event.id);
-        }
-      } else {
-        console.warn('⚠️ Pedido no encontrado en la lista local:', event.id);
-      }
+      this.handleOrderUpdated(event);
     }
   }
 
-  convertDTOToOrder(dto: OrderEventDTO): Order {
-    return {
-      id: dto.id,
-      table: dto.table,
-      paymentStatus: dto.paymentStatus as any,
-      preparationStatus: dto.preparationStatus as any,
-      deliveryStatus: dto.deliveryStatus as any,
-      creationDate: dto.creationDate,
-      paidAt: dto.paidAt,
-      preparedAt: dto.preparedAt,
-      deliveredAt: dto.deliveredAt,
-      takenBy: {
-        username: dto.takenBy,
-        role: ''
-      },
-      orderItems: dto.orderItems.map(item => ({
-        id: { orderId: dto.id, itemId: item.itemId },
-        order: null as any,
-        item: {
-          id: item.itemId,
-          name: item.itemName,
-          price: item.itemPrice
-        },
-        amount: item.amount
-      }))
-    };
+  private handleOrderCreated(event: OrderEventDTO): void {
+    const newOrder = this.orderMapper.convertDTOToOrder(event);
+    this.allOrders.push(newOrder);
+    this.applyFilters();
+  }
+
+  private handleOrderUpdated(event: OrderEventDTO): void {
+    const index = this.allOrders.findIndex(o => o.id === event.id);
+
+    if (index === -1) {
+      console.warn('⚠️ Pedido no encontrado en la lista local:', event.id);
+      return;
+    }
+
+    this.allOrders[index] = this.orderMapper.convertDTOToOrder(event);
+    this.applyFilters();
+
+    if (event.deliveryStatus === 'DELIVERED') {
+      this.orderTimerColors.delete(event.id);
+    }
   }
 
   calculateTotal(order: Order): number {
-    if (!order.orderItems || order.orderItems.length === 0) {
-      return 0;
-    }
-    return order.orderItems.reduce((total, orderItem) => {
-      return total + (orderItem.item.price * orderItem.amount);
-    }, 0);
+    return this.orderCalculation.calculateTotal(order);
   }
 
-  formatTimestamp(timestamp: string): string {
-    // Parse timestamp format "yyyy-MM-dd HH:mm:ss"
-    const date = new Date(timestamp.replace(' ', 'T'));
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }
-
-  calculateDuration(order: Order, stateTimestamp?: string): string {
+  formatStateTimestamp(order: Order, stateTimestamp: string | undefined): string {
     if (!stateTimestamp || !order.creationDate) {
       return '';
     }
-
-    const creationDate = new Date(order.creationDate.replace(' ', 'T'));
-    const stateDate = new Date(stateTimestamp.replace(' ', 'T'));
-
-    const diffMs = stateDate.getTime() - creationDate.getTime();
-    const diffMinutes = Math.floor(diffMs / 60000);
-    const hours = Math.floor(diffMinutes / 60);
-    const minutes = diffMinutes % 60;
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
+    return this.timeSyncService.formatElapsedTime(order.creationDate, stateTimestamp);
   }
 
   onOrderClick(order: Order): void {
@@ -238,26 +198,16 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    this.orders = this.allOrders.filter(order => {
-      if (this.filterConfig.paymentStatus !== 'ANY') {
-        if (order.paymentStatus !== this.filterConfig.paymentStatus) {
-          return false;
-        }
-      }
+    this.orders = this.allOrders.filter(order => this.matchesAllFilters(order));
+  }
 
-      if (this.filterConfig.preparationStatus !== 'ANY') {
-        if (order.preparationStatus !== this.filterConfig.preparationStatus) {
-          return false;
-        }
-      }
+  private matchesAllFilters(order: Order): boolean {
+    return this.matchesStatusFilter(order.paymentStatus, this.filterConfig.paymentStatus) &&
+           this.matchesStatusFilter(order.preparationStatus, this.filterConfig.preparationStatus) &&
+           this.matchesStatusFilter(order.deliveryStatus, this.filterConfig.deliveryStatus);
+  }
 
-      if (this.filterConfig.deliveryStatus !== 'ANY') {
-        if (order.deliveryStatus !== this.filterConfig.deliveryStatus) {
-          return false;
-        }
-      }
-
-      return true;
-    });
+  private matchesStatusFilter(orderStatus: string, filterStatus: string): boolean {
+    return filterStatus === 'ANY' || orderStatus === filterStatus;
   }
 }
