@@ -1,6 +1,7 @@
 package com.apuntame.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,11 +19,10 @@ public class User implements UserDetails {
     private String username;
 
     @Column(nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false)
-    @JsonIgnore
     private String role;
 
     @OneToMany(mappedBy = "takenBy", fetch = FetchType.LAZY)

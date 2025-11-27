@@ -3,7 +3,9 @@ package com.apuntame.backend.model;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,22 +33,27 @@ public class Order {
     private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
     @Column(name = "creation_date", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String creationDate;
 
     @Column(name = "paid_at")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String paidAt;
 
     @Column(name = "prepared_at")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String preparedAt;
 
     @Column(name = "delivered_at")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String deliveredAt;
 
     @ManyToOne
     @JoinColumn(name = "taken_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "user_fk"))
     private User takenBy;
 
-    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @BatchSize(size = 10)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     public Order() {

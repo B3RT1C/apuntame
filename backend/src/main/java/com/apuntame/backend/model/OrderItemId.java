@@ -1,37 +1,35 @@
 package com.apuntame.backend.model;
 
-import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Embeddable
 public class OrderItemId implements Serializable {
 
-    private Integer orderId;
-    private Integer itemId;
+    private Integer order;
+    private Integer item;
 
     public OrderItemId() {
     }
 
-    public OrderItemId(Integer orderId, Integer itemId) {
-        this.orderId = orderId;
-        this.itemId = itemId;
+    public OrderItemId(Integer order, Integer item) {
+        this.order = order;
+        this.item = item;
     }
 
-    public Integer getOrderId() {
-        return orderId;
+    public Integer getOrder() {
+        return order;
     }
 
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 
-    public Integer getItemId() {
-        return itemId;
+    public Integer getItem() {
+        return item;
     }
 
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
+    public void setItem(Integer item) {
+        this.item = item;
     }
 
     @Override
@@ -39,11 +37,11 @@ public class OrderItemId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderItemId that = (OrderItemId) o;
-        return Objects.equals(orderId, that.orderId) && Objects.equals(itemId, that.itemId);
+        return Objects.equals(order, that.order) && Objects.equals(item, that.item);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, itemId);
+        return Objects.hash(order, item);
     }
 }

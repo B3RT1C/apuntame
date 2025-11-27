@@ -7,7 +7,6 @@ export enum PaymentStatus {
 
 export enum PreparationStatus {
   PENDING = 'PENDING',
-  IN_PROGRESS = 'IN_PROGRESS',
   READY = 'READY',
   CANCELLED = 'CANCELLED'
 }

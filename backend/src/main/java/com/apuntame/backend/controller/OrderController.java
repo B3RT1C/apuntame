@@ -1,5 +1,7 @@
 package com.apuntame.backend.controller;
 
+import com.apuntame.backend.dto.OrderListResponseDTO;
+import com.apuntame.backend.dto.OrderResponseDTO;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
@@ -26,21 +28,21 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) Integer limit) {
-        List<Order> orders = orderService.getAllOrders(limit);
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<OrderListResponseDTO> getAllOrders(@RequestParam(required = false) Integer limit) {
+        OrderListResponseDTO response = orderService.getAllOrdersWithTimestamp(limit);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order createdOrder = orderService.createOrder(order);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
+    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody Order order) {
+        OrderResponseDTO response = orderService.createOrderWithTimestamp(order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Integer id) {
-        Order order = orderService.getOrderById(id);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<OrderResponseDTO> getOrderById(@PathVariable Integer id) {
+        OrderResponseDTO response = orderService.getOrderByIdWithTimestamp(id);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -88,20 +90,20 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/payment-status")
-    public ResponseEntity<Order> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentStatus paymentStatus) {
-        Order updatedOrder = orderService.updatePaymentStatus(id, paymentStatus);
-        return ResponseEntity.ok(updatedOrder);
+    public ResponseEntity<OrderResponseDTO> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentStatus paymentStatus) {
+        OrderResponseDTO response = orderService.updatePaymentStatusWithTimestamp(id, paymentStatus);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/preparation-status")
-    public ResponseEntity<Order> updatePreparationStatus(@PathVariable Integer id, @RequestBody PreparationStatus preparationStatus) {
-        Order updatedOrder = orderService.updatePreparationStatus(id, preparationStatus);
-        return ResponseEntity.ok(updatedOrder);
+    public ResponseEntity<OrderResponseDTO> updatePreparationStatus(@PathVariable Integer id, @RequestBody PreparationStatus preparationStatus) {
+        OrderResponseDTO response = orderService.updatePreparationStatusWithTimestamp(id, preparationStatus);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/delivery-status")
-    public ResponseEntity<Order> updateDeliveryStatus(@PathVariable Integer id, @RequestBody DeliveryStatus deliveryStatus) {
-        Order updatedOrder = orderService.updateDeliveryStatus(id, deliveryStatus);
-        return ResponseEntity.ok(updatedOrder);
+    public ResponseEntity<OrderResponseDTO> updateDeliveryStatus(@PathVariable Integer id, @RequestBody DeliveryStatus deliveryStatus) {
+        OrderResponseDTO response = orderService.updateDeliveryStatusWithTimestamp(id, deliveryStatus);
+        return ResponseEntity.ok(response);
     }
 }

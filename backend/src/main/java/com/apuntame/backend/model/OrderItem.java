@@ -5,20 +5,17 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Order_Items")
+@IdClass(OrderItemId.class)
 public class OrderItem {
 
-    @EmbeddedId
-    @JsonIgnore
-    private OrderItemId id;
-
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("orderId")
     @JoinColumn(name = "order_id", nullable = false, foreignKey = @ForeignKey(name = "order_fk"))
     @JsonIgnore
     private Order order;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @MapsId("itemId")
+    @Id
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false, foreignKey = @ForeignKey(name = "item_fk"))
     private Item item;
 
@@ -32,15 +29,6 @@ public class OrderItem {
         this.order = order;
         this.item = item;
         this.amount = amount;
-        this.id = new OrderItemId(order.getId(), item.getId());
-    }
-
-    public OrderItemId getId() {
-        return id;
-    }
-
-    public void setId(OrderItemId id) {
-        this.id = id;
     }
 
     public Order getOrder() {
@@ -49,10 +37,6 @@ public class OrderItem {
 
     public void setOrder(Order order) {
         this.order = order;
-        if (this.id == null) {
-            this.id = new OrderItemId();
-        }
-        this.id.setOrderId(order.getId());
     }
 
     public Item getItem() {
@@ -61,10 +45,6 @@ public class OrderItem {
 
     public void setItem(Item item) {
         this.item = item;
-        if (this.id == null) {
-            this.id = new OrderItemId();
-        }
-        this.id.setItemId(item.getId());
     }
 
     public Integer getAmount() {
