@@ -2,6 +2,7 @@ package com.apuntame.backend.service;
 
 import com.apuntame.backend.dto.OrderEventDTO;
 import com.apuntame.backend.model.Order;
+import com.apuntame.backend.model.User;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ public class OrderWebSocketService {
 
         mapBasicOrderFields(order, dto);
         mapOrderDates(order, dto);
-        mapTakenByUser(order, dto);
+        mapUserFields(order, dto);
         mapOrderItems(order, dto);
 
         return dto;
@@ -59,10 +60,15 @@ public class OrderWebSocketService {
         dto.setDeliveredAt(order.getDeliveredAt());
     }
 
-    private void mapTakenByUser(Order order, OrderEventDTO dto) {
-        if (order.getTakenBy() != null) {
-            dto.setTakenBy(order.getTakenBy().getUsername());
-        }
+    private void mapUserFields(Order order, OrderEventDTO dto) {
+        dto.setTakenBy(extractUsername(order.getTakenBy()));
+        dto.setChargedBy(extractUsername(order.getChargedBy()));
+        dto.setPreparedBy(extractUsername(order.getPreparedBy()));
+        dto.setDeliveredBy(extractUsername(order.getDeliveredBy()));
+    }
+
+    private String extractUsername(User user) {
+        return user != null ? user.getUsername() : null;
     }
 
     private void mapOrderItems(Order order, OrderEventDTO dto) {

@@ -24,6 +24,9 @@ public class OrderEventDTO {
     private String preparedAt;
     private String deliveredAt;
     private String takenBy;
+    private String chargedBy;
+    private String preparedBy;
+    private String deliveredBy;
     private List<OrderItemDTO> orderItems;
 
     public static class OrderItemDTO {
@@ -85,6 +88,15 @@ public class OrderEventDTO {
 
     public String getTakenBy() { return takenBy; }
     public void setTakenBy(String takenBy) { this.takenBy = takenBy; }
+
+    public String getChargedBy() { return chargedBy; }
+    public void setChargedBy(String chargedBy) { this.chargedBy = chargedBy; }
+
+    public String getPreparedBy() { return preparedBy; }
+    public void setPreparedBy(String preparedBy) { this.preparedBy = preparedBy; }
+
+    public String getDeliveredBy() { return deliveredBy; }
+    public void setDeliveredBy(String deliveredBy) { this.deliveredBy = deliveredBy; }
 
     public List<OrderItemDTO> getOrderItems() { return orderItems; }
     public void setOrderItems(List<OrderItemDTO> orderItems) { this.orderItems = orderItems; }

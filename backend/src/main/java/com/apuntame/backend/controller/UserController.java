@@ -57,9 +57,27 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{username}/orders")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable String username) {
-        List<Order> orders = userService.getUserOrders(username);
+    @GetMapping("/{username}/orders-taken")
+    public ResponseEntity<List<Order>> getOrdersTaken(@PathVariable String username) {
+        List<Order> orders = userService.getOrdersTaken(username);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{username}/orders-charged")
+    public ResponseEntity<List<Order>> getOrdersCharged(@PathVariable String username) {
+        List<Order> orders = userService.getOrdersCharged(username);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{username}/orders-prepared")
+    public ResponseEntity<List<Order>> getOrdersPrepared(@PathVariable String username) {
+        List<Order> orders = userService.getOrdersPrepared(username);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/{username}/orders-delivered")
+    public ResponseEntity<List<Order>> getOrdersDelivered(@PathVariable String username) {
+        List<Order> orders = userService.getOrdersDelivered(username);
         return ResponseEntity.ok(orders);
     }
 }

@@ -74,10 +74,28 @@ public class UserService {
         userRepository.deleteById(username);
     }
 
-    public List<Order> getUserOrders(String username) {
+    public List<Order> getOrdersTaken(String username) {
         User user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
-        return user.getOrders();
+        return user.getOrdersTaken();
+    }
+
+    public List<Order> getOrdersCharged(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
+        return user.getOrdersCharged();
+    }
+
+    public List<Order> getOrdersPrepared(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
+        return user.getOrdersPrepared();
+    }
+
+    public List<Order> getOrdersDelivered(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
+        return user.getOrdersDelivered();
     }
 
     private void validateUser(User user) {
