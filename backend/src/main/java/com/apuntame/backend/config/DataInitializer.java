@@ -127,6 +127,9 @@ public class DataInitializer implements CommandLineRunner {
         order.setPaidAt(formatTime(now.minusHours(2).plusMinutes(5)));
         order.setPreparedAt(formatTime(now.minusHours(2).plusMinutes(15)));
         order.setDeliveredAt(formatTime(now.minusHours(2).plusMinutes(20)));
+        order.setChargedBy(waiter);
+        order.setPreparedBy(waiter);
+        order.setDeliveredBy(waiter);
         addOrderItem(order, items.get(0), 2);
         addOrderItem(order, items.get(10), 2);
         orderService.createOrder(order);
@@ -138,6 +141,8 @@ public class DataInitializer implements CommandLineRunner {
             DeliveryStatus.PENDING, now.minusMinutes(30), waiter);
         order.setPaidAt(formatTime(now.minusMinutes(30).plusMinutes(2)));
         order.setPreparedAt(formatTime(now.minusMinutes(10)));
+        order.setChargedBy(waiter);
+        order.setPreparedBy(waiter);
         addOrderItem(order, items.get(7), 1);
         addOrderItem(order, items.get(4), 1);
         orderService.createOrder(order);
@@ -148,6 +153,7 @@ public class DataInitializer implements CommandLineRunner {
         Order order = createOrder("Mesa 3", PaymentStatus.PAID, PreparationStatus.PENDING,
             DeliveryStatus.PENDING, now.minusMinutes(20), waiter);
         order.setPaidAt(formatTime(now.minusMinutes(20).plusMinutes(1)));
+        order.setChargedBy(waiter);
         addOrderItem(order, items.get(13), 2);
         addOrderItem(order, items.get(3), 2);
         orderService.createOrder(order);

@@ -27,7 +27,19 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "takenBy", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Order> orders = new ArrayList<>();
+    private List<Order> ordersTaken = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chargedBy", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> ordersCharged = new ArrayList<>();
+
+    @OneToMany(mappedBy = "preparedBy", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> ordersPrepared = new ArrayList<>();
+
+    @OneToMany(mappedBy = "deliveredBy", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> ordersDelivered = new ArrayList<>();
 
     public User() {
     }
@@ -69,11 +81,35 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public List<Order> getOrdersTaken() {
+        return ordersTaken;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setOrdersTaken(List<Order> ordersTaken) {
+        this.ordersTaken = ordersTaken;
+    }
+
+    public List<Order> getOrdersCharged() {
+        return ordersCharged;
+    }
+
+    public void setOrdersCharged(List<Order> ordersCharged) {
+        this.ordersCharged = ordersCharged;
+    }
+
+    public List<Order> getOrdersPrepared() {
+        return ordersPrepared;
+    }
+
+    public void setOrdersPrepared(List<Order> ordersPrepared) {
+        this.ordersPrepared = ordersPrepared;
+    }
+
+    public List<Order> getOrdersDelivered() {
+        return ordersDelivered;
+    }
+
+    public void setOrdersDelivered(List<Order> ordersDelivered) {
+        this.ordersDelivered = ordersDelivered;
     }
 }

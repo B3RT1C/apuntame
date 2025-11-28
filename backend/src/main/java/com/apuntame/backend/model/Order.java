@@ -49,8 +49,20 @@ public class Order {
     private String deliveredAt;
 
     @ManyToOne
-    @JoinColumn(name = "taken_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "user_fk"))
+    @JoinColumn(name = "taken_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "fk_order_taken_by"))
     private User takenBy;
+
+    @ManyToOne
+    @JoinColumn(name = "charged_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "fk_order_charged_by"))
+    private User chargedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "prepared_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "fk_order_prepared_by"))
+    private User preparedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "delivered_by", referencedColumnName = "username", foreignKey = @ForeignKey(name = "fk_order_delivered_by"))
+    private User deliveredBy;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     @BatchSize(size = 10)
@@ -146,6 +158,30 @@ public class Order {
 
     public void setTakenBy(User takenBy) {
         this.takenBy = takenBy;
+    }
+
+    public User getChargedBy() {
+        return chargedBy;
+    }
+
+    public void setChargedBy(User chargedBy) {
+        this.chargedBy = chargedBy;
+    }
+
+    public User getPreparedBy() {
+        return preparedBy;
+    }
+
+    public void setPreparedBy(User preparedBy) {
+        this.preparedBy = preparedBy;
+    }
+
+    public User getDeliveredBy() {
+        return deliveredBy;
+    }
+
+    public void setDeliveredBy(User deliveredBy) {
+        this.deliveredBy = deliveredBy;
     }
 
     public List<OrderItem> getOrderItems() {
