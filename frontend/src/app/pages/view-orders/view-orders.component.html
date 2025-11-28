@@ -1,9 +1,14 @@
 <div class="view-orders-container">
   <div class="header-container">
     <h1>Vista de Pedidos</h1>
-    <button mat-icon-button (click)="openFilterDialog()" class="settings-button">
-      <mat-icon>settings</mat-icon>
-    </button>
+    <div class="action-buttons">
+      <button mat-icon-button (click)="toggleCompactMode()" class="compact-button" [class.active]="compactMode !== 'normal'">
+        <mat-icon>{{ compactMode === 'normal' ? 'view_compact' : compactMode === 'compact' ? 'view_module' : 'view_comfy' }}</mat-icon>
+      </button>
+      <button mat-icon-button (click)="openFilterDialog()" class="settings-button">
+        <mat-icon>settings</mat-icon>
+      </button>
+    </div>
   </div>
 
   @if (loading) {
@@ -11,9 +16,9 @@
   } @else if (orders.length === 0) {
     <p class="empty-message">No hay pedidos pendientes.</p>
   } @else {
-    <div class="orders-grid">
+    <div class="orders-grid" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'">
       @for (order of orders; track order.id) {
-        <mat-card class="order-card" (click)="onOrderClick(order)">
+        <mat-card class="order-card" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'" (click)="onOrderClick(order)">
           <mat-card-header>
             <mat-card-title>
               <div class="order-header">

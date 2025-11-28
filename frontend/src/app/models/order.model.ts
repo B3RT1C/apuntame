@@ -13,5 +13,8 @@ export interface Order {
   preparedAt?: string;
   deliveredAt?: string;
   takenBy: User;
+  chargedBy?: User;
+  preparedBy?: User;
+  deliveredBy?: User;
   orderItems: OrderItem[];
 }

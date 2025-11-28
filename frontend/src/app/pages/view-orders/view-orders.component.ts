@@ -6,17 +6,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OrderService } from '../../services/order.service';
-import { WebsocketService, OrderEventDTO } from '../../services/websocket.service';
+import { WebsocketService } from '../../services/websocket.service';
+import { OrderEventDTO, OrderEventType } from '../../models/order-event.model';
 import { TimeSyncService } from '../../services/time-sync.service';
 import { OrderMapperService } from '../../services/order-mapper.service';
 import { OrderCalculationService } from '../../services/order-calculation.service';
 import { Order } from '../../models/order.model';
-import { DeliveryStatus } from '../../models/order-status.model';
+import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../../models/order-status.model';
 import { OrderTimerComponent } from '../../components/order-timer/order-timer.component';
 import { PaymentStatusPipe } from '../../pipes/payment-status.pipe';
 import { PreparationStatusPipe } from '../../pipes/preparation-status.pipe';
 import { DeliveryStatusPipe } from '../../pipes/delivery-status.pipe';
-import { OrderFilterDialogComponent, OrderFilterConfig, OrderViewConfig, DialogData } from '../../components/order-filter-dialog/order-filter-dialog.component';
+import { OrderFilterDialogComponent } from '../../components/order-filter-dialog/order-filter-dialog.component';
+import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialogData } from '../../models/order-filter.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -40,6 +42,7 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   orders: Order[] = [];
   allOrders: Order[] = [];
   loading = true;
+  compactMode: 'normal' | 'compact' | 'extra-compact' = 'normal';
   private wsSubscription?: Subscription;
   orderTimerColors: Map<number, string> = new Map();
   filterConfig: OrderFilterConfig = {
@@ -54,6 +57,11 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
     showDeliveryStatus: true,
     showTotal: true,
     showTable: true
+  };
+  actionConfig: OrderActionConfig = {
+    updatePaymentOnClick: false,
+    updatePreparationOnClick: false,
+    updateDeliveryOnClick: true
   };
 
   constructor(
@@ -111,9 +119,9 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   }
 
   handleOrderEvent(event: OrderEventDTO): void {
-    if (event.eventType === 'CREATED') {
+    if (event.eventType === OrderEventType.CREATED) {
       this.handleOrderCreated(event);
-    } else if (event.eventType === 'UPDATED') {
+    } else if (event.eventType === OrderEventType.UPDATED) {
       this.handleOrderUpdated(event);
     }
   }
@@ -157,14 +165,17 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.orderService.updateDeliveryStatus(order.id, DeliveryStatus.DELIVERED).subscribe({
-      next: () => {
+    const paymentStatus = this.actionConfig.updatePaymentOnClick ? PaymentStatus.PAID : undefined;
+    const preparationStatus = this.actionConfig.updatePreparationOnClick ? PreparationStatus.READY : undefined;
+    const deliveryStatus = this.actionConfig.updateDeliveryOnClick ? DeliveryStatus.DELIVERED : undefined;
 
-      },
-      error: (error) => {
-        console.error('Error updating delivery status:', error);
-      }
-    });
+    if (paymentStatus || preparationStatus || deliveryStatus) {
+      this.orderService.updateMultipleStatuses(order.id, paymentStatus, preparationStatus, deliveryStatus).subscribe({
+        error: (error) => {
+          console.error('Error updating order status:', error);
+        }
+      });
+    }
   }
 
   onTimerColorChange(orderId: number, color: string): void {
@@ -184,14 +195,16 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
       width: '450px',
       data: {
         filterConfig: { ...this.filterConfig },
-        viewConfig: { ...this.viewConfig }
-      } as DialogData
+        viewConfig: { ...this.viewConfig },
+        actionConfig: { ...this.actionConfig }
+      } as OrderFilterDialogData
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.filterConfig = result.filterConfig;
         this.viewConfig = result.viewConfig;
+        this.actionConfig = result.actionConfig;
         this.applyFilters();
       }
     });
@@ -209,5 +222,15 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
 
   private matchesStatusFilter(orderStatus: string, filterStatus: string): boolean {
     return filterStatus === 'ANY' || orderStatus === filterStatus;
+  }
+
+  toggleCompactMode(): void {
+    if (this.compactMode === 'normal') {
+      this.compactMode = 'compact';
+    } else if (this.compactMode === 'compact') {
+      this.compactMode = 'extra-compact';
+    } else {
+      this.compactMode = 'normal';
+    }
   }
 }

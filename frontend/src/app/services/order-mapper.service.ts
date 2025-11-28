@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OrderEventDTO } from './websocket.service';
+import { OrderEventDTO } from '../models/order-event.model';
 import { Order } from '../models/order.model';
 
 @Injectable({
@@ -18,12 +18,15 @@ export class OrderMapperService {
       paidAt: dto.paidAt,
       preparedAt: dto.preparedAt,
       deliveredAt: dto.deliveredAt,
-      takenBy: this.mapTakenBy(dto.takenBy),
+      takenBy: this.mapUser(dto.takenBy),
+      chargedBy: dto.chargedBy ? this.mapUser(dto.chargedBy) : undefined,
+      preparedBy: dto.preparedBy ? this.mapUser(dto.preparedBy) : undefined,
+      deliveredBy: dto.deliveredBy ? this.mapUser(dto.deliveredBy) : undefined,
       orderItems: this.mapOrderItems(dto)
     };
   }
 
-  private mapTakenBy(username: string) {
+  private mapUser(username: string) {
     return {
       username: username,
       role: ''

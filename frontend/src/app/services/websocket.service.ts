@@ -4,26 +4,7 @@ import SockJS from 'sockjs-client';
 import { Subject, Observable } from 'rxjs';
 import { ApiEndpoints } from '../constants/api-endpoints.constants';
 import { AuthService } from './auth.service';
-
-export interface OrderEventDTO {
-  eventType: 'CREATED' | 'UPDATED';
-  id: number;
-  table: string;
-  paymentStatus: string;
-  preparationStatus: string;
-  deliveryStatus: string;
-  creationDate: string;
-  paidAt?: string;
-  preparedAt?: string;
-  deliveredAt?: string;
-  takenBy: string;
-  orderItems: Array<{
-    itemId: number;
-    itemName: string;
-    itemPrice: number;
-    amount: number;
-  }>;
-}
+import { OrderEventDTO } from '../models/order-event.model';
 
 @Injectable({
   providedIn: 'root'

@@ -65,6 +65,22 @@ export class OrderService {
     );
   }
 
+  updateMultipleStatuses(
+    orderId: number,
+    paymentStatus?: PaymentStatus,
+    preparationStatus?: PreparationStatus,
+    deliveryStatus?: DeliveryStatus
+  ): Observable<Order> {
+    const payload = {
+      paymentStatus,
+      preparationStatus,
+      deliveryStatus
+    };
+    return this.http.patch<OrderResponse>(`${this.baseUrl}/${orderId}/statuses`, payload).pipe(
+      map(response => response.order)
+    );
+  }
+
   addItemToOrder(orderId: number, orderItem: OrderItem): Observable<OrderItem> {
     return this.http.post<OrderItem>(`${this.baseUrl}/${orderId}/items`, orderItem);
   }

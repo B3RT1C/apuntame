@@ -13,12 +13,23 @@
       font-weight: 500;
     }
 
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .compact-button,
     .settings-button {
       color: rgba(0, 0, 0, 0.54);
-      transition: color 0.2s;
+      transition: all 0.2s;
 
       &:hover {
         color: #1976d2;
+      }
+
+      &.active {
+        color: #1976d2;
+        background-color: rgba(25, 118, 210, 0.1);
       }
     }
   }
@@ -39,6 +50,16 @@
   align-items: start;
   gap: 20px;
   padding-bottom: 20px;
+
+  &.compact {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+
+  &.extra-compact {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
 }
 
 .order-card {
@@ -57,6 +78,138 @@
 
   mat-card-content {
     padding: 8px 16px 16px 16px;
+  }
+
+  &.compact {
+    mat-card-header {
+      padding: 10px 12px 6px 12px;
+    }
+
+    mat-card-content {
+      padding: 6px 12px 12px 12px;
+    }
+
+    .order-id {
+      font-size: 16px !important;
+    }
+
+    .order-table {
+      font-size: 13px !important;
+    }
+
+    .timer-section {
+      mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
+
+    .total-section {
+      padding: 8px 0;
+
+      .total-label {
+        font-size: 12px !important;
+      }
+
+      .total-amount {
+        font-size: 16px !important;
+      }
+    }
+
+    .status-section {
+      gap: 6px;
+
+      .status-item {
+        .status-label {
+          font-size: 11px !important;
+          min-width: 70px;
+        }
+
+        .status-timestamp {
+          font-size: 10px !important;
+        }
+      }
+
+      mat-chip {
+        font-size: 9px !important;
+        min-height: 18px !important;
+        height: 18px !important;
+        padding: 0 5px !important;
+      }
+    }
+
+    .order-info {
+      gap: 12px;
+    }
+  }
+
+  &.extra-compact {
+    mat-card-header {
+      padding: 6px 8px 4px 8px;
+    }
+
+    mat-card-content {
+      padding: 4px 8px 8px 8px;
+    }
+
+    .order-id {
+      font-size: 14px !important;
+    }
+
+    .order-table {
+      font-size: 11px !important;
+    }
+
+    .timer-section {
+      mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+      }
+    }
+
+    .total-section {
+      padding: 6px 0;
+
+      .total-label {
+        font-size: 10px !important;
+      }
+
+      .total-amount {
+        font-size: 14px !important;
+      }
+    }
+
+    .status-section {
+      gap: 4px;
+
+      .status-item {
+        .status-label {
+          font-size: 9px !important;
+          min-width: 60px;
+        }
+
+        .status-timestamp {
+          font-size: 8px !important;
+        }
+      }
+
+      mat-chip {
+        font-size: 8px !important;
+        min-height: 16px !important;
+        height: 16px !important;
+        padding: 0 4px !important;
+      }
+    }
+
+    .order-info {
+      gap: 8px;
+    }
+
+    .order-meta {
+      gap: 8px;
+    }
   }
 }
 
