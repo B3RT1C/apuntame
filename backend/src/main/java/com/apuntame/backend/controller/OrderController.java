@@ -2,15 +2,18 @@ package com.apuntame.backend.controller;
 
 import com.apuntame.backend.dto.OrderListResponseDTO;
 import com.apuntame.backend.dto.OrderResponseDTO;
+import com.apuntame.backend.dto.UpdateMultipleStatusDTO;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.OrderItem;
+import com.apuntame.backend.model.User;
 import com.apuntame.backend.service.OrderItemService;
 import com.apuntame.backend.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -90,20 +93,43 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/payment-status")
-    public ResponseEntity<OrderResponseDTO> updatePaymentStatus(@PathVariable Integer id, @RequestBody PaymentStatus paymentStatus) {
-        OrderResponseDTO response = orderService.updatePaymentStatusWithTimestamp(id, paymentStatus);
+    public ResponseEntity<OrderResponseDTO> updatePaymentStatus(
+            @PathVariable Integer id,
+            @RequestBody PaymentStatus paymentStatus,
+            @AuthenticationPrincipal User currentUser) {
+        OrderResponseDTO response = orderService.updatePaymentStatusWithTimestamp(id, paymentStatus, currentUser);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/preparation-status")
-    public ResponseEntity<OrderResponseDTO> updatePreparationStatus(@PathVariable Integer id, @RequestBody PreparationStatus preparationStatus) {
-        OrderResponseDTO response = orderService.updatePreparationStatusWithTimestamp(id, preparationStatus);
+    public ResponseEntity<OrderResponseDTO> updatePreparationStatus(
+            @PathVariable Integer id,
+            @RequestBody PreparationStatus preparationStatus,
+            @AuthenticationPrincipal User currentUser) {
+        OrderResponseDTO response = orderService.updatePreparationStatusWithTimestamp(id, preparationStatus, currentUser);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/delivery-status")
-    public ResponseEntity<OrderResponseDTO> updateDeliveryStatus(@PathVariable Integer id, @RequestBody DeliveryStatus deliveryStatus) {
-        OrderResponseDTO response = orderService.updateDeliveryStatusWithTimestamp(id, deliveryStatus);
+    public ResponseEntity<OrderResponseDTO> updateDeliveryStatus(
+            @PathVariable Integer id,
+            @RequestBody DeliveryStatus deliveryStatus,
+            @AuthenticationPrincipal User currentUser) {
+        OrderResponseDTO response = orderService.updateDeliveryStatusWithTimestamp(id, deliveryStatus, currentUser);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/statuses")
+    public ResponseEntity<OrderResponseDTO> updateMultipleStatuses(
+            @PathVariable Integer id,
+            @RequestBody UpdateMultipleStatusDTO statusDTO,
+            @AuthenticationPrincipal User currentUser) {
+        OrderResponseDTO response = orderService.updateMultipleStatuses(
+                id,
+                statusDTO.getPaymentStatus(),
+                statusDTO.getPreparationStatus(),
+                statusDTO.getDeliveryStatus(),
+                currentUser);
         return ResponseEntity.ok(response);
     }
 }

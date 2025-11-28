@@ -134,32 +134,35 @@ public class OrderService {
         }
     }
 
-    public Order updatePaymentStatus(Integer orderId, PaymentStatus newStatus) {
+    public Order updatePaymentStatus(Integer orderId, PaymentStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
         Order order = findOrderById(orderId);
 
         order.setPaymentStatus(newStatus);
         setPaymentTimestampIfNeeded(order, newStatus);
+        setChargedByIfNeeded(order, newStatus, currentUser);
 
         return saveAndNotifyUpdate(order);
     }
 
-    public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus) {
+    public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
         Order order = findOrderById(orderId);
 
         order.setPreparationStatus(newStatus);
         setPreparationTimestampIfNeeded(order, newStatus);
+        setPreparedByIfNeeded(order, newStatus, currentUser);
 
         return saveAndNotifyUpdate(order);
     }
 
-    public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus) {
+    public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
         Order order = findOrderById(orderId);
 
         order.setDeliveryStatus(newStatus);
         setDeliveryTimestampIfNeeded(order, newStatus);
+        setDeliveredByIfNeeded(order, newStatus, currentUser);
 
         return saveAndNotifyUpdate(order);
     }
@@ -182,15 +185,34 @@ public class OrderService {
         }
     }
 
+    private void setChargedByIfNeeded(Order order, PaymentStatus newStatus, User currentUser) {
+        if ((newStatus == PaymentStatus.PAID || newStatus == PaymentStatus.CANCELLED ||
+             newStatus == PaymentStatus.REFUNDED) && order.getChargedBy() == null && currentUser != null) {
+            order.setChargedBy(currentUser);
+        }
+    }
+
     private void setPreparationTimestampIfNeeded(Order order, PreparationStatus newStatus) {
         if (newStatus == PreparationStatus.READY && order.getPreparedAt() == null) {
             order.setPreparedAt(getCurrentTimestamp());
         }
     }
 
+    private void setPreparedByIfNeeded(Order order, PreparationStatus newStatus, User currentUser) {
+        if (newStatus == PreparationStatus.READY && order.getPreparedBy() == null && currentUser != null) {
+            order.setPreparedBy(currentUser);
+        }
+    }
+
     private void setDeliveryTimestampIfNeeded(Order order, DeliveryStatus newStatus) {
         if (newStatus == DeliveryStatus.DELIVERED && order.getDeliveredAt() == null) {
             order.setDeliveredAt(getCurrentTimestamp());
+        }
+    }
+
+    private void setDeliveredByIfNeeded(Order order, DeliveryStatus newStatus, User currentUser) {
+        if (newStatus == DeliveryStatus.DELIVERED && order.getDeliveredBy() == null && currentUser != null) {
+            order.setDeliveredBy(currentUser);
         }
     }
 
@@ -236,18 +258,46 @@ public class OrderService {
         return new OrderResponseDTO(order, getCurrentTimestamp());
     }
 
-    public OrderResponseDTO updatePaymentStatusWithTimestamp(Integer orderId, PaymentStatus newStatus) {
-        Order updatedOrder = updatePaymentStatus(orderId, newStatus);
+    public OrderResponseDTO updatePaymentStatusWithTimestamp(Integer orderId, PaymentStatus newStatus, User currentUser) {
+        Order updatedOrder = updatePaymentStatus(orderId, newStatus, currentUser);
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
-    public OrderResponseDTO updatePreparationStatusWithTimestamp(Integer orderId, PreparationStatus newStatus) {
-        Order updatedOrder = updatePreparationStatus(orderId, newStatus);
+    public OrderResponseDTO updatePreparationStatusWithTimestamp(Integer orderId, PreparationStatus newStatus, User currentUser) {
+        Order updatedOrder = updatePreparationStatus(orderId, newStatus, currentUser);
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
-    public OrderResponseDTO updateDeliveryStatusWithTimestamp(Integer orderId, DeliveryStatus newStatus) {
-        Order updatedOrder = updateDeliveryStatus(orderId, newStatus);
+    public OrderResponseDTO updateDeliveryStatusWithTimestamp(Integer orderId, DeliveryStatus newStatus, User currentUser) {
+        Order updatedOrder = updateDeliveryStatus(orderId, newStatus, currentUser);
+        return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
+    }
+
+    public OrderResponseDTO updateMultipleStatuses(Integer orderId, PaymentStatus paymentStatus,
+                                                    PreparationStatus preparationStatus,
+                                                    DeliveryStatus deliveryStatus,
+                                                    User currentUser) {
+        Order order = findOrderById(orderId);
+
+        if (paymentStatus != null) {
+            order.setPaymentStatus(paymentStatus);
+            setPaymentTimestampIfNeeded(order, paymentStatus);
+            setChargedByIfNeeded(order, paymentStatus, currentUser);
+        }
+
+        if (preparationStatus != null) {
+            order.setPreparationStatus(preparationStatus);
+            setPreparationTimestampIfNeeded(order, preparationStatus);
+            setPreparedByIfNeeded(order, preparationStatus, currentUser);
+        }
+
+        if (deliveryStatus != null) {
+            order.setDeliveryStatus(deliveryStatus);
+            setDeliveryTimestampIfNeeded(order, deliveryStatus);
+            setDeliveredByIfNeeded(order, deliveryStatus, currentUser);
+        }
+
+        Order updatedOrder = saveAndNotifyUpdate(order);
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
