@@ -57,6 +57,22 @@
         </div>
       </div>
     </mat-tab>
+
+    <mat-tab label="Función">
+      <div class="tab-content">
+        <div class="checkbox-list">
+          <mat-slide-toggle [(ngModel)]="actionConfig.updatePaymentOnClick">
+            Marcar como pagado al hacer clic
+          </mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="actionConfig.updatePreparationOnClick">
+            Marcar como preparado al hacer clic
+          </mat-slide-toggle>
+          <mat-slide-toggle [(ngModel)]="actionConfig.updateDeliveryOnClick">
+            Marcar como entregado al hacer clic
+          </mat-slide-toggle>
+        </div>
+      </div>
+    </mat-tab>
   </mat-tab-group>
 </mat-dialog-content>
 

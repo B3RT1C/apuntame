@@ -5,29 +5,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FormsModule } from '@angular/forms';
 import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../../models/order-status.model';
-
-export interface OrderFilterConfig {
-  paymentStatus: string;
-  preparationStatus: string;
-  deliveryStatus: string;
-}
-
-export interface OrderViewConfig {
-  showOrderItems: boolean;
-  showPaymentStatus: boolean;
-  showPreparationStatus: boolean;
-  showDeliveryStatus: boolean;
-  showTotal: boolean;
-  showTable: boolean;
-}
-
-export interface DialogData {
-  filterConfig: OrderFilterConfig;
-  viewConfig: OrderViewConfig;
-}
+import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialogData } from '../../models/order-filter.model';
 
 @Component({
   selector: 'app-order-filter-dialog',
@@ -38,6 +20,7 @@ export interface DialogData {
     MatSelectModule,
     MatFormFieldModule,
     MatCheckboxModule,
+    MatSlideToggleModule,
     MatTabsModule,
     FormsModule
   ],
@@ -48,6 +31,7 @@ export interface DialogData {
 export class OrderFilterDialogComponent {
   filterConfig: OrderFilterConfig;
   viewConfig: OrderViewConfig;
+  actionConfig: OrderActionConfig;
 
   paymentStatusOptions = [
     { value: 'ANY', label: 'Cualquiera' },
@@ -71,10 +55,11 @@ export class OrderFilterDialogComponent {
 
   constructor(
     public dialogRef: MatDialogRef<OrderFilterDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Inject(MAT_DIALOG_DATA) public data: OrderFilterDialogData
   ) {
     this.filterConfig = { ...data.filterConfig };
     this.viewConfig = { ...data.viewConfig };
+    this.actionConfig = { ...data.actionConfig };
   }
 
   onCancel(): void {
@@ -82,6 +67,6 @@ export class OrderFilterDialogComponent {
   }
 
   onApply(): void {
-    this.dialogRef.close({ filterConfig: this.filterConfig, viewConfig: this.viewConfig });
+    this.dialogRef.close({ filterConfig: this.filterConfig, viewConfig: this.viewConfig, actionConfig: this.actionConfig });
   }
 }
