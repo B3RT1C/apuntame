@@ -18,10 +18,14 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         // Orígenes permitidos - Solo red local (SEGURO)
-        config.addAllowedOriginPattern("http://localhost:*");      // Desarrollo local
-        config.addAllowedOriginPattern("http://127.0.0.1:*");      // Desarrollo local (alternativo)
-        config.addAllowedOriginPattern("http://192.168.*.*:*");    // Red WiFi local (producción)
-        config.addAllowedOriginPattern("http://10.*.*.*:*");       // Otra configuración de red local
+        config.addAllowedOriginPattern("http://localhost");        // Producción Docker (puerto 80)
+        config.addAllowedOriginPattern("http://localhost:*");      // Desarrollo local (otros puertos)
+        config.addAllowedOriginPattern("http://127.0.0.1");        // Alternativo (puerto 80)
+        config.addAllowedOriginPattern("http://127.0.0.1:*");      // Alternativo (otros puertos)
+        config.addAllowedOriginPattern("http://192.168.*.*");      // Red WiFi local (puerto 80)
+        config.addAllowedOriginPattern("http://192.168.*.*:*");    // Red WiFi local (otros puertos)
+        config.addAllowedOriginPattern("http://10.*.*.*");         // Red local clase A (puerto 80)
+        config.addAllowedOriginPattern("http://10.*.*.*:*");       // Red local clase A (otros puertos)
 
         // Headers permitidos - Permitir todos los headers comunes
         config.addAllowedHeader("*");
