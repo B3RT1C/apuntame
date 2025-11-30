@@ -1,6 +1,9 @@
 # Ignorar archivos generados por Git en Windows (LF -> CRLF)
 
-*.cmd *.bat
+*.cmd
+# Permitir scripts de Docker
+!build-images.bat
+!push-images.bat
 
 # Ignorar archivo 'nul' problemático en Windows
 

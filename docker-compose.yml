@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: apuntame-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - apuntame-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    image: ghcr.io/b3rt1c/apuntame-backend:latest
+    container_name: apuntame-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      INITIALIZE_DEMO_DATA: ${INITIALIZE_DEMO_DATA}
+    volumes:
+      - jwt_secrets:/app/secrets
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - apuntame-network
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/b3rt1c/apuntame-frontend:latest
+    container_name: apuntame-frontend
+    networks:
+      - apuntame-network
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  jwt_secrets:
+
+networks:
+  apuntame-network:
+    driver: bridge

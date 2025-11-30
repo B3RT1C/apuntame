@@ -19,17 +19,20 @@ import com.apuntame.backend.service.ItemService;
 import com.apuntame.backend.service.OrderService;
 import com.apuntame.backend.service.SectionService;
 import com.apuntame.backend.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    @Value("${apuntame.initialize-demo-data:false}")
+    private boolean initializeDemoData;
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
@@ -67,95 +70,126 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.count() == 0) {
-            initializeUsers();
+        boolean isDatabaseEmpty =
+            userRepository.count() == 0 &&
+            itemRepository.count() == 0 &&
+            categoryRepository.count() == 0 &&
+            sectionRepository.count() == 0;
+
+        if (!isDatabaseEmpty) {
+            System.out.println("Database already initialized, skipping initialization");
+            return;
         }
 
-        if (categoryRepository.count() == 0) {
+        System.out.println("First run detected - Initializing database...");
+        initializeAdminUser();
+
+        if (initializeDemoData) {
+            System.out.println("Demo data initialization enabled");
             initializeCategories();
-        }
-
-        if (sectionRepository.count() == 0) {
             initializeSections();
-        }
-
-        if (itemRepository.count() == 0) {
             initializeMenuItems();
-        }
-
-        if (orderRepository.count() == 0) {
+            initializeDemoUsers();
             initializeSampleOrders();
+            System.out.println("Demo data initialization complete!");
+        } else {
+            System.out.println("Demo data initialization disabled (set INITIALIZE_DEMO_DATA=true to enable)");
         }
 
         System.out.println("Database initialization complete!");
     }
 
-    private void initializeUsers() {
-        System.out.println("Initializing database with default data...");
-
+    private void initializeAdminUser() {
         userService.createUser(new User("admin", "admin", "ADMIN"));
         System.out.println("Created admin user (username: admin, password: admin)");
+        System.out.println("SECURITY WARNING: Change admin password immediately after first login!");
+    }
 
-        userService.createUser(new User("user", "user", "WAITER"));
-        System.out.println("Created test user (username: user, password: user)");
-
+    private void initializeDemoUsers() {
         userService.createUser(new User("camarero1", "camarero1", "WAITER"));
         userService.createUser(new User("camarero2", "camarero2", "WAITER"));
-        System.out.println("Created sample waiters (camarero1, camarero2)");
+        System.out.println("Created demo waiters (camarero1, camarero2)");
     }
 
     private void initializeCategories() {
-        categoryService.createCategory(new Category("Bebidas calientes"));
-        categoryService.createCategory(new Category("Bebidas frías"));
-        categoryService.createCategory(new Category("Bebidas alcohólicas"));
-        categoryService.createCategory(new Category("Desayuno"));
-        categoryService.createCategory(new Category("Bocadillos"));
-        categoryService.createCategory(new Category("Platos"));
-        System.out.println("Created 6 categories");
+        categoryService.createCategory(new Category("Entrantes"));
+        categoryService.createCategory(new Category("Ensaladas"));
+        categoryService.createCategory(new Category("Carnes"));
+        categoryService.createCategory(new Category("Pescados"));
+        categoryService.createCategory(new Category("Postres"));
+        categoryService.createCategory(new Category("Bebidas"));
+        categoryService.createCategory(new Category("Cafés"));
+        categoryService.createCategory(new Category("Infusiones"));
+        System.out.println("Created 8 categories");
     }
 
     private void initializeSections() {
-        sectionService.createSection(new Section("Cocina Caliente"));
-        sectionService.createSection(new Section("Cocina Fría"));
         sectionService.createSection(new Section("Barra"));
-        sectionService.createSection(new Section("Pastelería"));
         sectionService.createSection(new Section("Plancha"));
-        System.out.println("Created 5 sections");
+        sectionService.createSection(new Section("Fríos"));
+        sectionService.createSection(new Section("Horno"));
+        sectionService.createSection(new Section("Postres"));
+        sectionService.createSection(new Section("Freidora"));
+        System.out.println("Created 6 sections");
     }
 
     private void initializeMenuItems() {
         List<Category> categories = categoryRepository.findAll();
-        Category bebidasCalientes = categories.get(0);
-        Category bebidasFrias = categories.get(1);
-        Category bebidasAlcoholicas = categories.get(2);
-        Category desayuno = categories.get(3);
-        Category bocadillos = categories.get(4);
-        Category platos = categories.get(5);
+        Category entrantes = categories.get(0);
+        Category ensaladas = categories.get(1);
+        Category carnes = categories.get(2);
+        Category pescados = categories.get(3);
+        Category postres = categories.get(4);
+        Category bebidas = categories.get(5);
+        Category cafes = categories.get(6);
+        Category infusiones = categories.get(7);
 
         List<Section> sections = sectionRepository.findAll();
-        Section cocinaCaliente = sections.get(0);
-        Section cocinaFria = sections.get(1);
-        Section barra = sections.get(2);
-        Section pasteleria = sections.get(3);
-        Section plancha = sections.get(4);
+        Section barra = sections.get(0);
+        Section plancha = sections.get(1);
+        Section frios = sections.get(2);
+        Section horno = sections.get(3);
+        Section postresZone = sections.get(4);
+        Section freidora = sections.get(5);
 
-        createItem("Café", "1.50", List.of(bebidasCalientes, desayuno), List.of(barra));
-        createItem("Té", "1.30", List.of(bebidasCalientes, desayuno), List.of(barra));
-        createItem("Agua", "1.00", List.of(bebidasFrias), List.of(barra));
-        createItem("Refresco", "2.00", List.of(bebidasFrias), List.of(barra));
-        createItem("Cerveza", "2.50", List.of(bebidasAlcoholicas, bebidasFrias), List.of(barra));
-        createItem("Vino tinto", "3.00", List.of(bebidasAlcoholicas), List.of(barra));
-        createItem("Vino blanco", "3.00", List.of(bebidasAlcoholicas), List.of(barra));
-        createItem("Bocadillo jamón", "4.50", List.of(bocadillos), List.of(plancha));
-        createItem("Bocadillo queso", "4.00", List.of(bocadillos), List.of(plancha));
-        createItem("Tostadas", "2.50", List.of(desayuno), List.of(plancha));
-        createItem("Croissant", "1.80", List.of(desayuno), List.of(pasteleria));
-        createItem("Ensalada", "5.50", List.of(platos), List.of(cocinaFria));
-        createItem("Hamburguesa", "8.00", List.of(platos), List.of(cocinaCaliente, plancha));
-        createItem("Pizza", "9.00", List.of(platos), List.of(cocinaCaliente));
-        createItem("Pasta", "7.50", List.of(platos), List.of(cocinaCaliente));
+        // Entrantes
+        createItem("Croquetas de jamón", "8.50", List.of(entrantes), List.of(freidora));
+        createItem("Jamón ibérico", "16.00", List.of(entrantes), List.of(frios));
+        createItem("Tortilla española", "6.50", List.of(entrantes), List.of(plancha));
+        createItem("Calamares a la romana", "10.00", List.of(entrantes), List.of(freidora));
 
-        System.out.println("Created 15 sample menu items with categories and sections");
+        // Ensaladas
+        createItem("Ensalada mixta", "7.00", List.of(ensaladas), List.of(frios));
+        createItem("Ensalada César", "8.50", List.of(ensaladas), List.of(frios));
+
+        // Carnes
+        createItem("Entrecot de ternera", "18.50", List.of(carnes), List.of(plancha));
+        createItem("Pollo asado", "12.00", List.of(carnes), List.of(horno));
+        createItem("Secreto ibérico", "15.00", List.of(carnes), List.of(plancha));
+
+        // Pescados
+        createItem("Merluza a la plancha", "14.00", List.of(pescados), List.of(plancha));
+        createItem("Salmón al horno", "16.50", List.of(pescados), List.of(horno));
+
+        // Postres
+        createItem("Tarta de queso", "5.50", List.of(postres), List.of(postresZone));
+        createItem("Flan casero", "4.00", List.of(postres), List.of(postresZone));
+        createItem("Helado", "4.50", List.of(postres), List.of(postresZone));
+
+        // Bebidas
+        createItem("Agua mineral", "1.50", List.of(bebidas), List.of(barra));
+        createItem("Coca-Cola", "2.50", List.of(bebidas), List.of(barra));
+        createItem("Cerveza Estrella Galicia", "2.50", List.of(bebidas), List.of(barra));
+        createItem("Vino tinto (copa)", "3.00", List.of(bebidas), List.of(barra));
+        createItem("Vino blanco (copa)", "3.00", List.of(bebidas), List.of(barra));
+
+        // Cafés e infusiones
+        createItem("Café solo", "1.20", List.of(cafes), List.of(barra));
+        createItem("Café con leche", "1.50", List.of(cafes), List.of(barra));
+        createItem("Té verde", "1.50", List.of(infusiones), List.of(barra));
+        createItem("Manzanilla", "1.30", List.of(infusiones), List.of(barra));
+
+        System.out.println("Created 23 realistic Spanish restaurant menu items");
     }
 
     private void createItem(String name, String price, List<Category> categories, List<Section> sections) {
@@ -186,7 +220,7 @@ public class DataInitializer implements CommandLineRunner {
         createAnotherPendingOrder(items, waiter1, now);
         createCancelledOrder(items, waiter2, now);
 
-        System.out.println("Successfully created 6 sample orders with items");
+        System.out.println("Successfully created 6 sample orders");
     }
 
     private void createCompletedOrder(List<Item> items, User waiter, LocalDateTime now) {
@@ -198,10 +232,9 @@ public class DataInitializer implements CommandLineRunner {
         order.setChargedBy(waiter);
         order.setPreparedBy(waiter);
         order.setDeliveredBy(waiter);
-        addOrderItem(order, items.get(0), 2);
-        addOrderItem(order, items.get(10), 2);
+        addOrderItem(order, items.get(0), 2); // Croquetas
+        addOrderItem(order, items.get(19), 2); // Café solo
         orderService.createOrder(order);
-        System.out.println("Created Order 1: Mesa 1 (Completed)");
     }
 
     private void createReadyForDeliveryOrder(List<Item> items, User waiter, LocalDateTime now) {
@@ -211,10 +244,9 @@ public class DataInitializer implements CommandLineRunner {
         order.setPreparedAt(formatTime(now.minusMinutes(10)));
         order.setChargedBy(waiter);
         order.setPreparedBy(waiter);
-        addOrderItem(order, items.get(7), 1);
-        addOrderItem(order, items.get(4), 1);
+        addOrderItem(order, items.get(6), 1); // Entrecot
+        addOrderItem(order, items.get(16), 1); // Cerveza
         orderService.createOrder(order);
-        System.out.println("Created Order 2: Mesa 2 (Ready for delivery)");
     }
 
     private void createPendingPreparationOrder(List<Item> items, User waiter, LocalDateTime now) {
@@ -222,37 +254,33 @@ public class DataInitializer implements CommandLineRunner {
             DeliveryStatus.PENDING, now.minusMinutes(20), waiter);
         order.setPaidAt(formatTime(now.minusMinutes(20).plusMinutes(1)));
         order.setChargedBy(waiter);
-        addOrderItem(order, items.get(13), 2);
-        addOrderItem(order, items.get(3), 2);
+        addOrderItem(order, items.get(7), 2); // Pollo asado
+        addOrderItem(order, items.get(15), 2); // Coca-Cola
         orderService.createOrder(order);
-        System.out.println("Created Order 3: Mesa 3 (Pending preparation)");
     }
 
     private void createPendingPaymentOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 4", PaymentStatus.PENDING, PreparationStatus.PENDING,
             DeliveryStatus.PENDING, now.minusMinutes(5), waiter);
-        addOrderItem(order, items.get(12), 1);
-        addOrderItem(order, items.get(14), 1);
-        addOrderItem(order, items.get(2), 2);
+        addOrderItem(order, items.get(9), 1); // Merluza
+        addOrderItem(order, items.get(11), 1); // Tarta de queso
+        addOrderItem(order, items.get(14), 2); // Agua
         orderService.createOrder(order);
-        System.out.println("Created Order 4: Mesa 4 (Pending payment)");
     }
 
     private void createAnotherPendingOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 5", PaymentStatus.PENDING, PreparationStatus.PENDING,
             DeliveryStatus.PENDING, now.minusMinutes(2), waiter);
-        addOrderItem(order, items.get(11), 1);
-        addOrderItem(order, items.get(6), 1);
+        addOrderItem(order, items.get(4), 1); // Ensalada mixta
+        addOrderItem(order, items.get(18), 1); // Vino blanco
         orderService.createOrder(order);
-        System.out.println("Created Order 5: Mesa 5 (Pending)");
     }
 
     private void createCancelledOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 6", PaymentStatus.CANCELLED, PreparationStatus.CANCELLED,
             DeliveryStatus.CANCELLED, now.minusHours(1), waiter);
-        addOrderItem(order, items.get(1), 1);
+        addOrderItem(order, items.get(1), 1); // Jamón ibérico
         orderService.createOrder(order);
-        System.out.println("Created Order 6: Mesa 6 (Cancelled)");
     }
 
     private Order createOrder(String table, PaymentStatus paymentStatus,
