@@ -1,17 +1,35 @@
-<div class="container">
-  <mat-form-field>
-    <mat-label>Número de Mesa</mat-label>
-    <input matInput [(ngModel)]="tableNumber" placeholder="Mesa">
-  </mat-form-field>
+<div class="take-order-container">
+  <div class="header-container">
+    <mat-form-field class="table-field">
+      <mat-label>Número de Mesa</mat-label>
+      <input matInput [(ngModel)]="tableNumber">
+    </mat-form-field>
+
+    <div class="action-buttons">
+      <button mat-icon-button (click)="toggleCardSize()" class="size-button" [class.active]="cardSize !== 'normal'">
+        <mat-icon>{{ cardSize === 'normal' ? 'view_module' : cardSize === 'large' ? 'view_compact' : 'view_comfy' }}</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="openCategoryFilterDialog()" class="filter-button">
+        <mat-icon>settings</mat-icon>
+      </button>
+    </div>
+  </div>
 
   <div class="layout">
     <div class="items-section">
+
       @if (loading) {
         <p>Cargando items...</p>
       } @else {
-        <div class="items-grid">
+        <div class="items-grid"
+             [class.compact]="cardSize === 'compact'"
+             [class.large]="cardSize === 'large'">
           @for (item of items; track item.id) {
-            <mat-card (click)="addItemToOrder(item)" class="item-card">
+            <mat-card (click)="addItemToOrder(item)"
+                      class="item-card"
+                      [class.compact]="cardSize === 'compact'"
+                      [class.large]="cardSize === 'large'">
               <mat-card-content>
                 <div class="item-name">{{ item.name }}</div>
                 <div class="item-price">{{ item.price | number:'1.2-2' }}€</div>
