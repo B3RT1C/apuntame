@@ -7,18 +7,21 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OrderService } from '../../services/order.service';
 import { WebsocketService } from '../../services/websocket.service';
+import { SectionService } from '../../services/section.service';
 import { OrderEventDTO, OrderEventType } from '../../models/order-event.model';
 import { TimeSyncService } from '../../services/time-sync.service';
 import { OrderMapperService } from '../../services/order-mapper.service';
 import { OrderCalculationService } from '../../services/order-calculation.service';
 import { Order } from '../../models/order.model';
+import { Section } from '../../models/section.model';
 import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../../models/order-status.model';
 import { OrderTimerComponent } from '../../components/order-timer/order-timer.component';
 import { PaymentStatusPipe } from '../../pipes/payment-status.pipe';
 import { PreparationStatusPipe } from '../../pipes/preparation-status.pipe';
 import { DeliveryStatusPipe } from '../../pipes/delivery-status.pipe';
-import { OrderFilterDialogComponent } from '../../components/order-filter-dialog/order-filter-dialog.component';
+import { OrderFilterDialogComponent } from './components/order-filter-dialog/order-filter-dialog.component';
 import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialogData } from '../../models/order-filter.model';
+import { FILTER_DIALOG_CONFIG } from '../../constants/dialog-config.constants';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -63,10 +66,14 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
     updatePreparationOnClick: false,
     updateDeliveryOnClick: true
   };
+  sections: Section[] = [];
+  selectedSections: number[] = [];
+  sectionFilterMode: 'OR' | 'AND' = 'OR';
 
   constructor(
     private orderService: OrderService,
     private websocketService: WebsocketService,
+    private sectionService: SectionService,
     private timeSyncService: TimeSyncService,
     private orderMapper: OrderMapperService,
     private orderCalculation: OrderCalculationService,
@@ -74,8 +81,20 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadSections();
     this.loadOrders();
     this.connectWebSocket();
+  }
+
+  loadSections(): void {
+    this.sectionService.getAllSections().subscribe({
+      next: (sections) => {
+        this.sections = sections;
+      },
+      error: (error) => {
+        console.error('Error loading sections:', error);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -192,17 +211,24 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
 
   openFilterDialog(): void {
     const dialogRef = this.dialog.open(OrderFilterDialogComponent, {
-      width: '450px',
+      ...FILTER_DIALOG_CONFIG,
       data: {
         filterConfig: { ...this.filterConfig },
+        sectionFilterConfig: {
+          selectedSections: [...this.selectedSections],
+          filterMode: this.sectionFilterMode
+        },
         viewConfig: { ...this.viewConfig },
-        actionConfig: { ...this.actionConfig }
+        actionConfig: { ...this.actionConfig },
+        sections: this.sections
       } as OrderFilterDialogData
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.filterConfig = result.filterConfig;
+        this.selectedSections = result.sectionFilterConfig.selectedSections;
+        this.sectionFilterMode = result.sectionFilterConfig.filterMode;
         this.viewConfig = result.viewConfig;
         this.actionConfig = result.actionConfig;
         this.applyFilters();
@@ -211,13 +237,39 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    this.orders = this.allOrders.filter(order => this.matchesAllFilters(order));
+    this.orders = this.allOrders
+      .filter(order => this.matchesAllFilters(order))
+      .map(order => this.filterOrderItemsBySections(order))
+      .filter(order => order.orderItems.length > 0);
   }
 
   private matchesAllFilters(order: Order): boolean {
     return this.matchesStatusFilter(order.paymentStatus, this.filterConfig.paymentStatus) &&
            this.matchesStatusFilter(order.preparationStatus, this.filterConfig.preparationStatus) &&
            this.matchesStatusFilter(order.deliveryStatus, this.filterConfig.deliveryStatus);
+  }
+
+  private filterOrderItemsBySections(order: Order): Order {
+    if (this.selectedSections.length === 0) {
+      return order;
+    }
+
+    const filteredOrder = { ...order };
+    filteredOrder.orderItems = order.orderItems.filter(orderItem => {
+      if (!orderItem.item.sections || orderItem.item.sections.length === 0) {
+        return false;
+      }
+
+      const itemSectionIds = orderItem.item.sections.map(s => s.id);
+
+      if (this.sectionFilterMode === 'AND') {
+        return this.selectedSections.every(sectionId => itemSectionIds.includes(sectionId));
+      } else {
+        return this.selectedSections.some(sectionId => itemSectionIds.includes(sectionId));
+      }
+    });
+
+    return filteredOrder;
   }
 
   private matchesStatusFilter(orderStatus: string, filterStatus: string): boolean {

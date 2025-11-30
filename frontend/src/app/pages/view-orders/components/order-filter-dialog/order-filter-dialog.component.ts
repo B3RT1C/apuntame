@@ -8,11 +8,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FormsModule } from '@angular/forms';
-import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../../models/order-status.model';
-import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialogData } from '../../models/order-filter.model';
+import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../../../../models/order-status.model';
+import { OrderFilterConfig, OrderSectionFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialogData } from '../../../../models/order-filter.model';
+import { Section } from '../../../../models/section.model';
+import { GenericFilterComponent } from '../../../../components/generic-filter/generic-filter.component';
 
 @Component({
   selector: 'app-order-filter-dialog',
+  standalone: true,
   imports: [
     CommonModule,
     MatDialogModule,
@@ -22,7 +25,8 @@ import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialo
     MatCheckboxModule,
     MatSlideToggleModule,
     MatTabsModule,
-    FormsModule
+    FormsModule,
+    GenericFilterComponent
   ],
   templateUrl: './order-filter-dialog.component.html',
   styleUrl: './order-filter-dialog.component.scss'
@@ -30,8 +34,10 @@ import { OrderFilterConfig, OrderViewConfig, OrderActionConfig, OrderFilterDialo
 
 export class OrderFilterDialogComponent {
   filterConfig: OrderFilterConfig;
+  sectionFilterConfig: OrderSectionFilterConfig;
   viewConfig: OrderViewConfig;
   actionConfig: OrderActionConfig;
+  sections: Section[];
 
   paymentStatusOptions = [
     { value: 'ANY', label: 'Cualquiera' },
@@ -58,8 +64,18 @@ export class OrderFilterDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: OrderFilterDialogData
   ) {
     this.filterConfig = { ...data.filterConfig };
+    this.sectionFilterConfig = { ...data.sectionFilterConfig };
     this.viewConfig = { ...data.viewConfig };
     this.actionConfig = { ...data.actionConfig };
+    this.sections = data.sections || [];
+  }
+
+  onSectionSelectedIdsChange(ids: number[]): void {
+    this.sectionFilterConfig.selectedSections = ids;
+  }
+
+  onSectionFilterModeChange(mode: 'OR' | 'AND'): void {
+    this.sectionFilterConfig.filterMode = mode;
   }
 
   onCancel(): void {
@@ -67,6 +83,11 @@ export class OrderFilterDialogComponent {
   }
 
   onApply(): void {
-    this.dialogRef.close({ filterConfig: this.filterConfig, viewConfig: this.viewConfig, actionConfig: this.actionConfig });
+    this.dialogRef.close({
+      filterConfig: this.filterConfig,
+      sectionFilterConfig: this.sectionFilterConfig,
+      viewConfig: this.viewConfig,
+      actionConfig: this.actionConfig
+    });
   }
 }

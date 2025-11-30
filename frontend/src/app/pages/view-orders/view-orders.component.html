@@ -1,11 +1,10 @@
 <div class="view-orders-container">
   <div class="header-container">
-    <h1>Vista de Pedidos</h1>
     <div class="action-buttons">
       <button mat-icon-button (click)="toggleCompactMode()" class="compact-button" [class.active]="compactMode !== 'normal'">
         <mat-icon>{{ compactMode === 'normal' ? 'view_compact' : compactMode === 'compact' ? 'view_module' : 'view_comfy' }}</mat-icon>
       </button>
-      <button mat-icon-button (click)="openFilterDialog()" class="settings-button">
+      <button mat-icon-button (click)="openFilterDialog()" class="settings-button" [class.active]="selectedSections.length > 0">
         <mat-icon>settings</mat-icon>
       </button>
     </div>

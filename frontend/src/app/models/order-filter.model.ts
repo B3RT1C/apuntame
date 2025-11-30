@@ -1,7 +1,14 @@
+import { Section } from './section.model';
+
 export interface OrderFilterConfig {
   paymentStatus: string;
   preparationStatus: string;
   deliveryStatus: string;
+}
+
+export interface OrderSectionFilterConfig {
+  selectedSections: number[];
+  filterMode: 'OR' | 'AND';
 }
 
 export interface OrderViewConfig {
@@ -21,6 +28,8 @@ export interface OrderActionConfig {
 
 export interface OrderFilterDialogData {
   filterConfig: OrderFilterConfig;
+  sectionFilterConfig: OrderSectionFilterConfig;
   viewConfig: OrderViewConfig;
   actionConfig: OrderActionConfig;
+  sections: Section[];
 }

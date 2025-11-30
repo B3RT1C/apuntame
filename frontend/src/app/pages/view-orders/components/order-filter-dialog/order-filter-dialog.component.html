@@ -58,6 +58,19 @@
       </div>
     </mat-tab>
 
+    <mat-tab label="Secciones">
+      <div class="tab-content">
+        <app-generic-filter
+          [items]="sections"
+          [selectedIds]="sectionFilterConfig.selectedSections"
+          [filterMode]="sectionFilterConfig.filterMode"
+          searchPlaceholder="Buscar sección"
+          (selectedIdsChange)="onSectionSelectedIdsChange($event)"
+          (filterModeChange)="onSectionFilterModeChange($event)">
+        </app-generic-filter>
+      </div>
+    </mat-tab>
+
     <mat-tab label="Función">
       <div class="tab-content">
         <div class="checkbox-list">
