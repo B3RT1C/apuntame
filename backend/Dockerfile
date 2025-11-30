@@ -23,8 +23,9 @@ RUN addgroup -g 1001 appuser && \
 # Copy JAR from builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
-# Copy entrypoint script
+# Copy entrypoint script and fix line endings (CRLF -> LF)
 COPY entrypoint.sh /app/entrypoint.sh
+RUN sed -i 's/\r$//' /app/entrypoint.sh
 
 # Create secrets directory and set permissions
 RUN mkdir -p /app/secrets && \
