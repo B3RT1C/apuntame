@@ -18,6 +18,14 @@ public class ErrorMessages {
     public static final String ITEM_NAME_EMPTY = "El nombre del producto no puede estar vacío";
     public static final String ITEM_PRICE_INVALID = "El precio debe ser mayor que 0";
 
+    // Category errors
+    public static final String CATEGORY_NOT_FOUND = "Categoría no encontrada con id: %s";
+    public static final String CATEGORY_NAME_EMPTY = "El nombre de la categoría no puede estar vacío";
+
+    // Section errors
+    public static final String SECTION_NOT_FOUND = "Sección no encontrada con id: %s";
+    public static final String SECTION_NAME_EMPTY = "El nombre de la sección no puede estar vacío";
+
     // Order errors
     public static final String ORDER_NOT_FOUND = "Pedido no encontrado con id: %s";
     //TODO

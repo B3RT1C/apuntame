@@ -3,15 +3,21 @@ package com.apuntame.backend.config;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
+import com.apuntame.backend.model.Category;
 import com.apuntame.backend.model.Item;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.OrderItem;
+import com.apuntame.backend.model.Section;
 import com.apuntame.backend.model.User;
+import com.apuntame.backend.repository.CategoryRepository;
 import com.apuntame.backend.repository.ItemRepository;
 import com.apuntame.backend.repository.OrderRepository;
+import com.apuntame.backend.repository.SectionRepository;
 import com.apuntame.backend.repository.UserRepository;
+import com.apuntame.backend.service.CategoryService;
 import com.apuntame.backend.service.ItemService;
 import com.apuntame.backend.service.OrderService;
+import com.apuntame.backend.service.SectionService;
 import com.apuntame.backend.service.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -28,29 +34,49 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
+    private final CategoryRepository categoryRepository;
+    private final SectionRepository sectionRepository;
     private final UserService userService;
     private final ItemService itemService;
     private final OrderService orderService;
+    private final CategoryService categoryService;
+    private final SectionService sectionService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public DataInitializer(UserRepository userRepository,
                           ItemRepository itemRepository,
                           OrderRepository orderRepository,
+                          CategoryRepository categoryRepository,
+                          SectionRepository sectionRepository,
                           UserService userService,
                           ItemService itemService,
-                          OrderService orderService) {
+                          OrderService orderService,
+                          CategoryService categoryService,
+                          SectionService sectionService) {
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
         this.orderRepository = orderRepository;
+        this.categoryRepository = categoryRepository;
+        this.sectionRepository = sectionRepository;
         this.userService = userService;
         this.itemService = itemService;
         this.orderService = orderService;
+        this.categoryService = categoryService;
+        this.sectionService = sectionService;
     }
 
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0) {
             initializeUsers();
+        }
+
+        if (categoryRepository.count() == 0) {
+            initializeCategories();
+        }
+
+        if (sectionRepository.count() == 0) {
+            initializeSections();
         }
 
         if (itemRepository.count() == 0) {
@@ -78,23 +104,65 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("Created sample waiters (camarero1, camarero2)");
     }
 
+    private void initializeCategories() {
+        categoryService.createCategory(new Category("Bebidas calientes"));
+        categoryService.createCategory(new Category("Bebidas frías"));
+        categoryService.createCategory(new Category("Bebidas alcohólicas"));
+        categoryService.createCategory(new Category("Desayuno"));
+        categoryService.createCategory(new Category("Bocadillos"));
+        categoryService.createCategory(new Category("Platos"));
+        System.out.println("Created 6 categories");
+    }
+
+    private void initializeSections() {
+        sectionService.createSection(new Section("Cocina Caliente"));
+        sectionService.createSection(new Section("Cocina Fría"));
+        sectionService.createSection(new Section("Barra"));
+        sectionService.createSection(new Section("Pastelería"));
+        sectionService.createSection(new Section("Plancha"));
+        System.out.println("Created 5 sections");
+    }
+
     private void initializeMenuItems() {
-        itemService.createItem(new Item("Café", new BigDecimal("1.50")));
-        itemService.createItem(new Item("Té", new BigDecimal("1.30")));
-        itemService.createItem(new Item("Agua", new BigDecimal("1.00")));
-        itemService.createItem(new Item("Refresco", new BigDecimal("2.00")));
-        itemService.createItem(new Item("Cerveza", new BigDecimal("2.50")));
-        itemService.createItem(new Item("Vino tinto", new BigDecimal("3.00")));
-        itemService.createItem(new Item("Vino blanco", new BigDecimal("3.00")));
-        itemService.createItem(new Item("Bocadillo jamón", new BigDecimal("4.50")));
-        itemService.createItem(new Item("Bocadillo queso", new BigDecimal("4.00")));
-        itemService.createItem(new Item("Tostadas", new BigDecimal("2.50")));
-        itemService.createItem(new Item("Croissant", new BigDecimal("1.80")));
-        itemService.createItem(new Item("Ensalada", new BigDecimal("5.50")));
-        itemService.createItem(new Item("Hamburguesa", new BigDecimal("8.00")));
-        itemService.createItem(new Item("Pizza", new BigDecimal("9.00")));
-        itemService.createItem(new Item("Pasta", new BigDecimal("7.50")));
-        System.out.println("Created 15 sample menu items");
+        List<Category> categories = categoryRepository.findAll();
+        Category bebidasCalientes = categories.get(0);
+        Category bebidasFrias = categories.get(1);
+        Category bebidasAlcoholicas = categories.get(2);
+        Category desayuno = categories.get(3);
+        Category bocadillos = categories.get(4);
+        Category platos = categories.get(5);
+
+        List<Section> sections = sectionRepository.findAll();
+        Section cocinaCaliente = sections.get(0);
+        Section cocinaFria = sections.get(1);
+        Section barra = sections.get(2);
+        Section pasteleria = sections.get(3);
+        Section plancha = sections.get(4);
+
+        createItem("Café", "1.50", List.of(bebidasCalientes, desayuno), List.of(barra));
+        createItem("Té", "1.30", List.of(bebidasCalientes, desayuno), List.of(barra));
+        createItem("Agua", "1.00", List.of(bebidasFrias), List.of(barra));
+        createItem("Refresco", "2.00", List.of(bebidasFrias), List.of(barra));
+        createItem("Cerveza", "2.50", List.of(bebidasAlcoholicas, bebidasFrias), List.of(barra));
+        createItem("Vino tinto", "3.00", List.of(bebidasAlcoholicas), List.of(barra));
+        createItem("Vino blanco", "3.00", List.of(bebidasAlcoholicas), List.of(barra));
+        createItem("Bocadillo jamón", "4.50", List.of(bocadillos), List.of(plancha));
+        createItem("Bocadillo queso", "4.00", List.of(bocadillos), List.of(plancha));
+        createItem("Tostadas", "2.50", List.of(desayuno), List.of(plancha));
+        createItem("Croissant", "1.80", List.of(desayuno), List.of(pasteleria));
+        createItem("Ensalada", "5.50", List.of(platos), List.of(cocinaFria));
+        createItem("Hamburguesa", "8.00", List.of(platos), List.of(cocinaCaliente, plancha));
+        createItem("Pizza", "9.00", List.of(platos), List.of(cocinaCaliente));
+        createItem("Pasta", "7.50", List.of(platos), List.of(cocinaCaliente));
+
+        System.out.println("Created 15 sample menu items with categories and sections");
+    }
+
+    private void createItem(String name, String price, List<Category> categories, List<Section> sections) {
+        Item item = new Item(name, new BigDecimal(price));
+        item.setCategories(categories);
+        item.setSections(sections);
+        itemService.createItem(item);
     }
 
     private void initializeSampleOrders() {

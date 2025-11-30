@@ -21,6 +21,22 @@ public class Item {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "ItemCategories",
+        joinColumns = @JoinColumn(name = "item_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "ItemSections",
+        joinColumns = @JoinColumn(name = "item_id"),
+        inverseJoinColumns = @JoinColumn(name = "section_id")
+    )
+    private List<Section> sections = new ArrayList<>();
+
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -63,5 +79,21 @@ public class Item {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
+    public List<Section> getSections() {
+        return sections;
+    }
+
+    public void setSections(List<Section> sections) {
+        this.sections = sections;
     }
 }
