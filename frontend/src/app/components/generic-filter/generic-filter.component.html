@@ -1,0 +1,49 @@
+<mat-form-field class="search-field" appearance="outline">
+  <mat-label>{{ searchPlaceholder }}</mat-label>
+  <input
+    matInput
+    [(ngModel)]="searchText"
+    (ngModelChange)="filterItems()"
+    placeholder="Escribe para filtrar">
+</mat-form-field>
+
+<div class="filter-controls">
+  @if (showFilterMode) {
+    <mat-button-toggle-group
+      class="filter-mode-toggle"
+      [value]="filterMode"
+      (change)="onFilterModeChange($event.value)">
+      <mat-button-toggle value="OR">
+        <span class="toggle-text">O (cualquiera)</span>
+      </mat-button-toggle>
+      <mat-button-toggle value="AND">
+        <span class="toggle-text">Y (todos)</span>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  }
+
+  <div class="checkbox-row">
+    <mat-checkbox [(ngModel)]="showOnlySelected" (ngModelChange)="filterItems()" class="show-selected-checkbox">
+      Solo seleccionados
+    </mat-checkbox>
+    @if (selectedIds.length > 0) {
+      <button mat-button color="warn" (click)="clearFilters()" class="clear-button">
+        <mat-icon>clear</mat-icon>
+        Limpiar filtros
+      </button>
+    }
+  </div>
+</div>
+
+<div class="items-list">
+  @for (item of filteredItems; track item.id) {
+    <mat-chip
+      [class.selected]="isItemSelected(item.id)"
+      (click)="toggleItem(item.id)">
+      {{ item.name }}
+    </mat-chip>
+  }
+  @if (filteredItems.length === 0) {
+    <p class="no-results">No se encontraron resultados</p>
+  }
+</div>

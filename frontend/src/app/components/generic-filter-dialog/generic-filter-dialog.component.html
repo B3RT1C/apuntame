@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+  <div class="dialog-content">
+    <app-generic-filter
+      [items]="data.items"
+      [selectedIds]="selectedIds"
+      [filterMode]="filterMode"
+      [searchPlaceholder]="data.searchPlaceholder"
+      (selectedIdsChange)="onSelectedIdsChange($event)"
+      (filterModeChange)="onFilterModeChange($event)">
+    </app-generic-filter>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onApply()">Aplicar</button>
+</mat-dialog-actions>

@@ -1,5 +1,6 @@
 package com.apuntame.backend.controller;
 
+import com.apuntame.backend.constant.FilterMode;
 import com.apuntame.backend.model.Item;
 import com.apuntame.backend.service.ItemService;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Item>> getAllItems(@RequestParam(required = false) Integer limit) {
-        List<Item> items = itemService.getAllItems(limit);
+    public ResponseEntity<List<Item>> getAllItems(
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) List<Integer> categories,
+            @RequestParam(required = false) List<Integer> sections,
+            @RequestParam(required = false, defaultValue = "OR") String filterMode) {
+        List<Item> items;
+
+        if (categories != null && !categories.isEmpty()) {
+            items = itemService.getItemsByCategories(categories, filterMode);
+        } else if (sections != null && !sections.isEmpty()) {
+            items = itemService.getItemsBySections(sections, filterMode);
+        } else {
+            items = itemService.getAllItems(limit);
+        }
+
         return ResponseEntity.ok(items);
     }
 

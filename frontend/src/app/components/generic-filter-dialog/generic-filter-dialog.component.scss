@@ -1,0 +1,87 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.search-field {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.filter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  .filter-mode-toggle {
+    width: 100%;
+
+    mat-button-toggle {
+      flex: 1;
+
+      .toggle-text {
+        white-space: normal;
+        word-wrap: break-word;
+        display: inline-block;
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .show-selected-checkbox {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .clear-button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+.items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+
+  mat-chip {
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: rgba(25, 118, 210, 0.1);
+    }
+
+    &.selected {
+      background-color: #1976d2 !important;
+      color: white;
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 20px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
