@@ -30,6 +30,10 @@ export const routes: Routes = [
       {
         path: AppRoutes.PATH.VIEW_ORDERS,
         loadComponent: () => import('./pages/view-orders/view-orders.component').then(m => m.ViewOrdersComponent)
+      },
+      {
+        path: AppRoutes.PATH.MANAGEMENT,
+        loadComponent: () => import('./pages/management/management.component').then(m => m.ManagementComponent)
       }
     ]
   },

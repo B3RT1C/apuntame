@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="sectionForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" required>
+      @if (sectionForm.get('name')?.hasError('required')) {
+        <mat-error>El nombre es requerido</mat-error>
+      }
+      @if (sectionForm.get('name')?.hasError('minlength')) {
+        <mat-error>El nombre debe tener al menos 2 caracteres</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="sectionForm.invalid">
+    {{ isEditMode ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

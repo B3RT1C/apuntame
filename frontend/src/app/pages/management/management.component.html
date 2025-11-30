@@ -1,0 +1,233 @@
+<div class="management-container">
+  <mat-tab-group>
+    <mat-tab label="Categorías">
+      <div class="tab-content">
+        <div class="tab-header">
+          <mat-form-field class="search-field">
+            <mat-label>Buscar</mat-label>
+            <input matInput [(ngModel)]="categorySearchText" (keyup)="applyFilterCategories()" placeholder="Buscar por nombre">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="createCategory()">
+            <mat-icon>add</mat-icon>
+            Crear Categoría
+          </button>
+        </div>
+
+        @if (categoriesLoading) {
+          <div class="loading-container">
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="filteredCategories" class="data-table">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let category">{{ category.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="itemCount">
+              <th mat-header-cell *matHeaderCellDef>Artículos</th>
+              <td mat-cell *matCellDef="let category">{{ getItemCountForCategory(category.id) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let category">
+                <button mat-icon-button (click)="editCategory(category)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteCategory(category)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="categoryColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: categoryColumns"></tr>
+          </table>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Secciones">
+      <div class="tab-content">
+        <div class="tab-header">
+          <mat-form-field class="search-field">
+            <mat-label>Buscar</mat-label>
+            <input matInput [(ngModel)]="sectionSearchText" (keyup)="applyFilterSections()" placeholder="Buscar por nombre">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="createSection()">
+            <mat-icon>add</mat-icon>
+            Crear Sección
+          </button>
+        </div>
+
+        @if (sectionsLoading) {
+          <div class="loading-container">
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="filteredSections" class="data-table">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let section">{{ section.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="itemCount">
+              <th mat-header-cell *matHeaderCellDef>Artículos</th>
+              <td mat-cell *matCellDef="let section">{{ getItemCountForSection(section.id) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let section">
+                <button mat-icon-button (click)="editSection(section)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteSection(section)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="sectionColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: sectionColumns"></tr>
+          </table>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Artículos">
+      <div class="tab-content">
+        <div class="tab-header">
+          <mat-form-field class="search-field">
+            <mat-label>Buscar</mat-label>
+            <input matInput [(ngModel)]="itemSearchText" (keyup)="applyFilterItems()" placeholder="Buscar por nombre">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="createItem()">
+            <mat-icon>add</mat-icon>
+            Crear Artículo
+          </button>
+        </div>
+
+        @if (itemsLoading) {
+          <div class="loading-container">
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="filteredItems" class="data-table">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>
+              <td mat-cell *matCellDef="let item">{{ item.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Precio</th>
+              <td mat-cell *matCellDef="let item">{{ item.price | number:'1.2-2' }}€</td>
+            </ng-container>
+
+            <ng-container matColumnDef="categories">
+              <th mat-header-cell *matHeaderCellDef>Categorías</th>
+              <td mat-cell *matCellDef="let item">
+                @if (item.categories && item.categories.length > 0) {
+                  <mat-chip-set>
+                    @for (category of item.categories; track category.id) {
+                      <mat-chip>{{ category.name }}</mat-chip>
+                    }
+                  </mat-chip-set>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="sections">
+              <th mat-header-cell *matHeaderCellDef>Secciones</th>
+              <td mat-cell *matCellDef="let item">
+                @if (item.sections && item.sections.length > 0) {
+                  <mat-chip-set>
+                    @for (section of item.sections; track section.id) {
+                      <mat-chip>{{ section.name }}</mat-chip>
+                    }
+                  </mat-chip-set>
+                }
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let item">
+                <button mat-icon-button (click)="editItem(item)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteItem(item)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: itemColumns"></tr>
+          </table>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Usuarios">
+      <div class="tab-content">
+        <div class="tab-header">
+          <mat-form-field class="search-field">
+            <mat-label>Buscar</mat-label>
+            <input matInput [(ngModel)]="userSearchText" (keyup)="applyFilterUsers()" placeholder="Buscar por nombre o rol">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="createUser()">
+            <mat-icon>add</mat-icon>
+            Crear Usuario
+          </button>
+        </div>
+
+        @if (usersLoading) {
+          <div class="loading-container">
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <div class="table-container">
+            <table mat-table [dataSource]="filteredUsers" class="data-table">
+            <ng-container matColumnDef="username">
+              <th mat-header-cell *matHeaderCellDef>Nombre de usuario</th>
+              <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>Rol</th>
+              <td mat-cell *matCellDef="let user">{{ user.role }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button (click)="editUser(user)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteUser(user)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="userColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: userColumns"></tr>
+          </table>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -4,7 +4,8 @@ export class AppRoutes {
     HOME: '',
     TAKE_ORDER: 'tomar-pedidos',
     CHARGE_ORDER: 'cobrar-pedidos',
-    VIEW_ORDERS: 'vista-pedidos'
+    VIEW_ORDERS: 'vista-pedidos',
+    MANAGEMENT: 'management'
   };
 
   static readonly ROUTE = {
@@ -12,6 +13,7 @@ export class AppRoutes {
     HOME: '/',
     TAKE_ORDER: '/tomar-pedidos',
     CHARGE_ORDER: '/cobrar-pedidos',
-    VIEW_ORDERS: '/vista-pedidos'
+    VIEW_ORDERS: '/vista-pedidos',
+    MANAGEMENT: '/management'
   };
 }

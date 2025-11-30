@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre de usuario</mat-label>
+      <input matInput formControlName="username" required>
+      @if (userForm.get('username')?.hasError('required')) {
+        <mat-error>El nombre de usuario es requerido</mat-error>
+      }
+      @if (userForm.get('username')?.hasError('minlength')) {
+        <mat-error>El nombre de usuario debe tener al menos 3 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    @if (!isEditMode) {
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input matInput type="password" formControlName="password" required>
+        @if (userForm.get('password')?.hasError('required')) {
+          <mat-error>La contraseña es requerida</mat-error>
+        }
+        @if (userForm.get('password')?.hasError('minlength')) {
+          <mat-error>La contraseña debe tener al menos 6 caracteres</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <input matInput formControlName="role" required>
+      @if (userForm.get('role')?.hasError('required')) {
+        <mat-error>El rol es requerido</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="userForm.invalid">
+    {{ isEditMode ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

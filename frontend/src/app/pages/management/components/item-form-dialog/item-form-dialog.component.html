@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="itemForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" required>
+      @if (itemForm.get('name')?.hasError('required')) {
+        <mat-error>El nombre es requerido</mat-error>
+      }
+      @if (itemForm.get('name')?.hasError('minlength')) {
+        <mat-error>El nombre debe tener al menos 2 caracteres</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Precio</mat-label>
+      <input matInput type="number" step="0.01" formControlName="price" required>
+      <span matTextSuffix>€</span>
+      @if (itemForm.get('price')?.hasError('required')) {
+        <mat-error>El precio es requerido</mat-error>
+      }
+      @if (itemForm.get('price')?.hasError('min')) {
+        <mat-error>El precio debe ser mayor que 0</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-divider></mat-divider>
+
+    <div class="filter-section">
+      <h3>Categorías</h3>
+      <app-generic-filter
+        [items]="data.allCategories"
+        [selectedIds]="selectedCategoryIds"
+        [showFilterMode]="false"
+        (selectedIdsChange)="onCategoryIdsChange($event)"
+        searchPlaceholder="Buscar categorías">
+      </app-generic-filter>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="filter-section">
+      <h3>Secciones</h3>
+      <app-generic-filter
+        [items]="data.allSections"
+        [selectedIds]="selectedSectionIds"
+        [showFilterMode]="false"
+        (selectedIdsChange)="onSectionIdsChange($event)"
+        searchPlaceholder="Buscar secciones">
+      </app-generic-filter>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="itemForm.invalid">
+    {{ isEditMode ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>
