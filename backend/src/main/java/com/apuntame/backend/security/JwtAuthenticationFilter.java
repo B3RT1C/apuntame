@@ -1,6 +1,8 @@
 package com.apuntame.backend.security;
 
 import com.apuntame.backend.constant.JwtConstants;
+import com.apuntame.backend.model.ActiveToken;
+import com.apuntame.backend.repository.ActiveTokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,16 +16,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
+    private final ActiveTokenRepository activeTokenRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService, ActiveTokenRepository activeTokenRepository) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.activeTokenRepository = activeTokenRepository;
     }
 
     @Override
@@ -54,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.isTokenValid(jwt, userDetails.getUsername())) {
+            if (jwtUtil.isTokenValid(jwt, userDetails.getUsername()) && isTokenActiveInDatabase(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -68,5 +73,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isTokenActiveInDatabase(String token) {
+        Optional<ActiveToken> activeToken = activeTokenRepository.findByToken(token);
+        return activeToken.isPresent() && !activeToken.get().isExpired();
     }
 }

@@ -6,6 +6,7 @@ import com.apuntame.backend.exception.InvalidDataException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.User;
+import com.apuntame.backend.repository.ActiveTokenRepository;
 import com.apuntame.backend.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +19,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ActiveTokenRepository activeTokenRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ActiveTokenRepository activeTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.activeTokenRepository = activeTokenRepository;
     }
 
     public List<User> getAllUsers(Integer limit) {
@@ -56,12 +59,20 @@ public class UserService {
         User user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username)));
 
+        boolean shouldInvalidateToken = false;
+
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+            shouldInvalidateToken = true;
         }
 
         if (userDetails.getRole() != null && !userDetails.getRole().isEmpty()) {
             user.setRole(userDetails.getRole());
+            shouldInvalidateToken = true;
+        }
+
+        if (shouldInvalidateToken) {
+            activeTokenRepository.deleteById(username);
         }
 
         return userRepository.save(user);
@@ -71,6 +82,7 @@ public class UserService {
         if (!userRepository.existsById(username)) {
             throw new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, username));
         }
+        activeTokenRepository.deleteById(username);
         userRepository.deleteById(username);
     }
 

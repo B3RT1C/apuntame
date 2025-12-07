@@ -29,7 +29,6 @@ export class MainLayoutComponent {
   sidenavOpened: boolean = false;
 
   menuItems: ListItem[] = [
-    { label: 'Inicio', route: AppRoutes.ROUTE.HOME, icon: 'home' },
     { label: 'Tomar pedidos', route: AppRoutes.ROUTE.TAKE_ORDER, icon: 'add_shopping_cart' },
     { label: 'Editar pedido', route: AppRoutes.ROUTE.CHARGE_ORDER, icon: 'edit' },
     { label: 'Vista pedidos', route: AppRoutes.ROUTE.VIEW_ORDERS, icon: 'list_alt' },

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { AppRoutes } from './constants/app-routes.constants';
 import { LoginComponent } from './pages/login/login.component';
-import { HomeComponent } from './pages/home/home.component';
 import { MainLayoutComponent } from './components/main-layout/main-layout.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -17,7 +16,8 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: HomeComponent
+        redirectTo: AppRoutes.PATH.TAKE_ORDER,
+        pathMatch: 'full'
       },
       {
         path: AppRoutes.PATH.TAKE_ORDER,
