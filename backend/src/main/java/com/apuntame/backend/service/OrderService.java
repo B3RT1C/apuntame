@@ -301,6 +301,27 @@ public class OrderService {
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
+    public Order prepareItems(Integer orderId, List<Integer> itemIds, User currentUser) {
+        Order order = findOrderById(orderId);
+
+        order.getOrderItems().forEach(orderItem -> {
+            if (itemIds.contains(orderItem.getItem().getId())) {
+                orderItem.setPrepared(true);
+            }
+        });
+
+        boolean allItemsPrepared = order.getOrderItems().stream()
+                .allMatch(OrderItem::isPrepared);
+
+        if (allItemsPrepared && order.getPreparationStatus() != PreparationStatus.READY) {
+            order.setPreparationStatus(PreparationStatus.READY);
+            setPreparationTimestampIfNeeded(order, PreparationStatus.READY);
+            setPreparedByIfNeeded(order, PreparationStatus.READY, currentUser);
+        }
+
+        return saveAndNotifyUpdate(order);
+    }
+
     private void validateOrderItemAmount(Integer amount) {
         if (amount == null || amount <= 0) {
             throw new InvalidDataException(ErrorMessages.ORDER_ITEM_AMOUNT_INVALID);

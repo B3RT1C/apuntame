@@ -132,4 +132,13 @@ public class OrderController {
                 currentUser);
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{orderId}/items/prepare")
+    public ResponseEntity<Order> prepareItems(
+            @PathVariable Integer orderId,
+            @RequestBody List<Integer> itemIds,
+            @AuthenticationPrincipal User currentUser) {
+        Order updatedOrder = orderService.prepareItems(orderId, itemIds, currentUser);
+        return ResponseEntity.ok(updatedOrder);
+    }
 }

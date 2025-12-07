@@ -8,6 +8,7 @@ export interface OrderItemDTO {
   itemName: string;
   itemPrice: number;
   amount: number;
+  prepared: boolean;
 }
 
 export interface OrderEventDTO {

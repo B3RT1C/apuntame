@@ -34,14 +34,16 @@ public class OrderEventDTO {
         private String itemName;
         private BigDecimal itemPrice;
         private Integer amount;
+        private boolean prepared;
 
         public OrderItemDTO() {}
 
-        public OrderItemDTO(Integer itemId, String itemName, BigDecimal itemPrice, Integer amount) {
+        public OrderItemDTO(Integer itemId, String itemName, BigDecimal itemPrice, Integer amount, boolean prepared) {
             this.itemId = itemId;
             this.itemName = itemName;
             this.itemPrice = itemPrice;
             this.amount = amount;
+            this.prepared = prepared;
         }
 
         public Integer getItemId() { return itemId; }
@@ -52,6 +54,8 @@ public class OrderEventDTO {
         public void setItemPrice(BigDecimal itemPrice) { this.itemPrice = itemPrice; }
         public Integer getAmount() { return amount; }
         public void setAmount(Integer amount) { this.amount = amount; }
+        public boolean isPrepared() { return prepared; }
+        public void setPrepared(boolean prepared) { this.prepared = prepared; }
     }
 
     public OrderEventDTO() {}

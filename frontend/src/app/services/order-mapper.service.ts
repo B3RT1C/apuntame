@@ -42,7 +42,8 @@ export class OrderMapperService {
         name: item.itemName,
         price: item.itemPrice
       },
-      amount: item.amount
+      amount: item.amount,
+      prepared: item.prepared
     }));
   }
 }

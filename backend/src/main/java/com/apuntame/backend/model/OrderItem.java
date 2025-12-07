@@ -22,6 +22,9 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer amount;
 
+    @Column(nullable = false)
+    private boolean prepared = false;
+
     public OrderItem() {
     }
 
@@ -29,6 +32,7 @@ public class OrderItem {
         this.order = order;
         this.item = item;
         this.amount = amount;
+        this.prepared = false;
     }
 
     public Order getOrder() {
@@ -53,5 +57,13 @@ public class OrderItem {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    public void setPrepared(boolean prepared) {
+        this.prepared = prepared;
     }
 }

@@ -161,10 +161,6 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
 
     this.allOrders[index] = this.orderMapper.convertDTOToOrder(event);
     this.applyFilters();
-
-    if (event.deliveryStatus === 'DELIVERED') {
-      this.orderTimerColors.delete(event.id);
-    }
   }
 
   calculateTotal(order: Order): number {
@@ -184,12 +180,25 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.actionConfig.updatePreparationOnClick) {
+      const itemIds = order.orderItems
+        .filter(oi => !oi.prepared)
+        .map(oi => oi.item.id!);
+
+      if (itemIds.length > 0) {
+        this.orderService.prepareItems(order.id, itemIds).subscribe({
+          error: (error) => {
+            console.error('Error preparing items:', error);
+          }
+        });
+      }
+    }
+
     const paymentStatus = this.actionConfig.updatePaymentOnClick ? PaymentStatus.PAID : undefined;
-    const preparationStatus = this.actionConfig.updatePreparationOnClick ? PreparationStatus.READY : undefined;
     const deliveryStatus = this.actionConfig.updateDeliveryOnClick ? DeliveryStatus.DELIVERED : undefined;
 
-    if (paymentStatus || preparationStatus || deliveryStatus) {
-      this.orderService.updateMultipleStatuses(order.id, paymentStatus, preparationStatus, deliveryStatus).subscribe({
+    if (paymentStatus || deliveryStatus) {
+      this.orderService.updateMultipleStatuses(order.id, paymentStatus, undefined, deliveryStatus).subscribe({
         error: (error) => {
           console.error('Error updating order status:', error);
         }
@@ -240,7 +249,18 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
     this.orders = this.allOrders
       .filter(order => this.matchesAllFilters(order))
       .map(order => this.filterOrderItemsBySections(order))
-      .filter(order => order.orderItems.length > 0);
+      .filter(order => this.shouldShowOrder(order));
+  }
+
+  private shouldShowOrder(order: Order): boolean {
+    const hasItemFilters = this.selectedSections.length > 0 ||
+      this.filterConfig.preparationStatus === PreparationStatus.PENDING;
+
+    if (!hasItemFilters) {
+      return true;
+    }
+
+    return order.orderItems.length > 0;
   }
 
   private matchesAllFilters(order: Order): boolean {
@@ -250,12 +270,17 @@ export class ViewOrdersComponent implements OnInit, OnDestroy {
   }
 
   private filterOrderItemsBySections(order: Order): Order {
-    if (this.selectedSections.length === 0) {
-      return order;
-    }
-
     const filteredOrder = { ...order };
+
     filteredOrder.orderItems = order.orderItems.filter(orderItem => {
+      if (this.filterConfig.preparationStatus === PreparationStatus.PENDING && orderItem.prepared) {
+        return false;
+      }
+
+      if (this.selectedSections.length === 0) {
+        return true;
+      }
+
       if (!orderItem.item.sections || orderItem.item.sections.length === 0) {
         return false;
       }

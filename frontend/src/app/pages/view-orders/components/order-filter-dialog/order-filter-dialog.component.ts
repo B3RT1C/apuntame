@@ -50,7 +50,7 @@ export class OrderFilterDialogComponent {
   preparationStatusOptions = [
     { value: 'ANY', label: 'Cualquiera' },
     { value: PreparationStatus.PENDING, label: 'Pendiente' },
-    { value: PreparationStatus.READY, label: 'Listo' }
+    { value: PreparationStatus.READY, label: 'Preparado' }
   ];
 
   deliveryStatusOptions = [

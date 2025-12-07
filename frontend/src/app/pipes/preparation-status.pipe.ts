@@ -8,7 +8,7 @@ import { PreparationStatus } from '../models/order-status.model';
 export class PreparationStatusPipe implements PipeTransform {
   private translations: { [key: string]: string } = {
     'PENDING': 'Pendiente',
-    'READY': 'Listo',
+    'READY': 'Preparado',
     'CANCELLED': 'Cancelado'
   };
 

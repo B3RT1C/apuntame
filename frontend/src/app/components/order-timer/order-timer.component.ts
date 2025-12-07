@@ -67,7 +67,7 @@ export class OrderTimerComponent implements OnInit, OnDestroy {
   private handleCompletedOrder(isFullyCompleted: boolean): void {
     if (isFullyCompleted && !this.isStopped) {
       this.isStopped = true;
-      this.setTimerClass('red');
+      this.setTimerClass('stopped');
 
       if (this.intervalId) {
         clearInterval(this.intervalId);

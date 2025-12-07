@@ -5,6 +5,7 @@ export interface OrderItem {
   id?: OrderItemId;
   item: Item;
   amount: number;
+  prepared: boolean;
   order?: Order;
 }
 

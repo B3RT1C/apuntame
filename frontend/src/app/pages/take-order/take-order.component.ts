@@ -146,7 +146,8 @@ export class TakeOrderComponent implements OnInit {
     } else {
       this.orderItems.push({
         item: item,
-        amount: 1
+        amount: 1,
+        prepared: false
       });
     }
   }
@@ -175,7 +176,8 @@ export class TakeOrderComponent implements OnInit {
       takenBy: this.currentUser,
       orderItems: this.orderItems.map(oi => ({
         item: { id: oi.item.id } as Item,
-        amount: oi.amount
+        amount: oi.amount,
+        prepared: false
       }))
     };
 

@@ -103,4 +103,8 @@ export class OrderService {
       : `${this.baseUrl}/${orderId}/items/${itemId}`;
     return this.http.delete<void>(url);
   }
+
+  prepareItems(orderId: number, itemIds: number[]): Observable<Order> {
+    return this.http.patch<Order>(`${this.baseUrl}/${orderId}/items/prepare`, itemIds);
+  }
 }

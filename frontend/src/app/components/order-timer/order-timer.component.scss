@@ -20,4 +20,10 @@
     color: #c62828;
     background-color: #ffebee;
   }
+
+  &.stopped {
+    color: #757575;
+    background-color: #f5f5f5;
+    font-style: italic;
+  }
 }

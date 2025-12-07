@@ -86,7 +86,8 @@ public class OrderWebSocketService {
                 orderItem.getItem().getId(),
                 orderItem.getItem().getName(),
                 orderItem.getItem().getPrice(),
-                orderItem.getAmount()
+                orderItem.getAmount(),
+                orderItem.isPrepared()
         );
     }
 }
