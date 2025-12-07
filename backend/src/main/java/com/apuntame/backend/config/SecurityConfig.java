@@ -1,6 +1,7 @@
 package com.apuntame.backend.config;
 
 import com.apuntame.backend.constant.JwtConstants;
+import com.apuntame.backend.constant.SecurityConstants;
 import com.apuntame.backend.security.CustomUserDetailsService;
 import com.apuntame.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -42,10 +43,10 @@ public class SecurityConfig {
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, SecurityConstants.ALL_ROUTES_PATTERN).permitAll()
                 .requestMatchers(JwtConstants.LOGIN_ENDPOINT).permitAll()
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers(SecurityConstants.WS_ENDPOINT_PATTERN).permitAll()
+                .requestMatchers(SecurityConstants.ACTUATOR_ENDPOINT).permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())

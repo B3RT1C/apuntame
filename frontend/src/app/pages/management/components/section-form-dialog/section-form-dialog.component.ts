@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Section } from '../../../../models/section.model';
+import { UI_MESSAGES } from '../../../../constants/ui-messages.constants';
 
 export interface SectionFormDialogData {
   section?: Section;
@@ -39,7 +40,7 @@ export class SectionFormDialogComponent implements OnInit {
   }
 
   get title(): string {
-    return this.isEditMode ? 'Editar Sección' : 'Crear Sección';
+    return this.isEditMode ? UI_MESSAGES.EDIT_SECTION_TITLE : UI_MESSAGES.CREATE_SECTION_TITLE;
   }
 
   onSubmit(): void {

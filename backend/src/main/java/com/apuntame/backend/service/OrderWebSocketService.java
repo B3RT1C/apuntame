@@ -1,5 +1,6 @@
 package com.apuntame.backend.service;
 
+import com.apuntame.backend.constant.WebSocketConstants;
 import com.apuntame.backend.dto.OrderEventDTO;
 import com.apuntame.backend.model.Order;
 import com.apuntame.backend.model.User;
@@ -20,7 +21,7 @@ public class OrderWebSocketService {
     public void notifyOrderCreated(Order order) {
         OrderEventDTO event = convertToDTO(order, OrderEventDTO.EventType.CREATED);
         System.out.println("Enviando notificación WebSocket CREATED para pedido ID: " + order.getId());
-        messagingTemplate.convertAndSend("/topic/orders", event);
+        messagingTemplate.convertAndSend(WebSocketConstants.ORDERS_TOPIC, event);
     }
 
     public void notifyOrderUpdated(Order order) {
@@ -29,7 +30,7 @@ public class OrderWebSocketService {
                           " - Payment: " + order.getPaymentStatus() +
                           ", Preparation: " + order.getPreparationStatus() +
                           ", Delivery: " + order.getDeliveryStatus());
-        messagingTemplate.convertAndSend("/topic/orders", event);
+        messagingTemplate.convertAndSend(WebSocketConstants.ORDERS_TOPIC, event);
         System.out.println("Notificación WebSocket UPDATED enviada");
     }
 

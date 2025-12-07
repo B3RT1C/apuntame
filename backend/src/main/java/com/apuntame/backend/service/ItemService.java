@@ -63,31 +63,8 @@ public class ItemService {
 
     public Item createItem(Item item) {
         validateItem(item);
-
-        if (item.getCategories() != null && !item.getCategories().isEmpty()) {
-            List<Category> managedCategories = new ArrayList<>();
-            for (Category category : item.getCategories()) {
-                if (category.getId() != null) {
-                    Category managedCategory = categoryRepository.findById(category.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + category.getId()));
-                    managedCategories.add(managedCategory);
-                }
-            }
-            item.setCategories(managedCategories);
-        }
-
-        if (item.getSections() != null && !item.getSections().isEmpty()) {
-            List<Section> managedSections = new ArrayList<>();
-            for (Section section : item.getSections()) {
-                if (section.getId() != null) {
-                    Section managedSection = sectionRepository.findById(section.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + section.getId()));
-                    managedSections.add(managedSection);
-                }
-            }
-            item.setSections(managedSections);
-        }
-
+        item.setCategories(resolveCategories(item.getCategories()));
+        item.setSections(resolveSections(item.getSections()));
         return itemRepository.save(item);
     }
 
@@ -109,30 +86,46 @@ public class ItemService {
         }
 
         if (itemDetails.getCategories() != null) {
-            List<Category> managedCategories = new ArrayList<>();
-            for (Category category : itemDetails.getCategories()) {
-                if (category.getId() != null) {
-                    Category managedCategory = categoryRepository.findById(category.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + category.getId()));
-                    managedCategories.add(managedCategory);
-                }
-            }
-            item.setCategories(managedCategories);
+            item.setCategories(resolveCategories(itemDetails.getCategories()));
         }
 
         if (itemDetails.getSections() != null) {
-            List<Section> managedSections = new ArrayList<>();
-            for (Section section : itemDetails.getSections()) {
-                if (section.getId() != null) {
-                    Section managedSection = sectionRepository.findById(section.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Section not found with id: " + section.getId()));
-                    managedSections.add(managedSection);
-                }
-            }
-            item.setSections(managedSections);
+            item.setSections(resolveSections(itemDetails.getSections()));
         }
 
         return itemRepository.save(item);
+    }
+
+    private List<Category> resolveCategories(List<Category> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Category> managedCategories = new ArrayList<>();
+        for (Category category : categories) {
+            if (category.getId() != null) {
+                Category managedCategory = categoryRepository.findById(category.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                String.format(ErrorMessages.CATEGORY_NOT_FOUND, category.getId())));
+                managedCategories.add(managedCategory);
+            }
+        }
+        return managedCategories;
+    }
+
+    private List<Section> resolveSections(List<Section> sections) {
+        if (sections == null || sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Section> managedSections = new ArrayList<>();
+        for (Section section : sections) {
+            if (section.getId() != null) {
+                Section managedSection = sectionRepository.findById(section.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                String.format(ErrorMessages.SECTION_NOT_FOUND, section.getId())));
+                managedSections.add(managedSection);
+            }
+        }
+        return managedSections;
     }
 
     public void deleteItem(Integer id) {

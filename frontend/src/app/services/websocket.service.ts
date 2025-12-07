@@ -3,6 +3,7 @@ import { Client, StompConfig } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { Subject, Observable } from 'rxjs';
 import { ApiEndpoints } from '../constants/api-endpoints.constants';
+import { WEBSOCKET_CONFIG } from '../constants/websocket.constants';
 import { AuthService } from './auth.service';
 import { OrderEventDTO } from '../models/order-event.model';
 
@@ -32,9 +33,9 @@ export class WebsocketService {
       connectHeaders: {
         Authorization: `Bearer ${token}`
       },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+      reconnectDelay: WEBSOCKET_CONFIG.RECONNECT_DELAY,
+      heartbeatIncoming: WEBSOCKET_CONFIG.HEARTBEAT_INCOMING,
+      heartbeatOutgoing: WEBSOCKET_CONFIG.HEARTBEAT_OUTGOING,
       onConnect: () => {
         this.subscribeToOrders();
       },

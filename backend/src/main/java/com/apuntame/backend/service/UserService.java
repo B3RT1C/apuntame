@@ -1,6 +1,7 @@
 package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
+import com.apuntame.backend.constant.UserConstants;
 import com.apuntame.backend.exception.DuplicateResourceException;
 import com.apuntame.backend.exception.InvalidDataException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
@@ -42,7 +43,7 @@ public class UserService {
         }
 
         if (user.getRole() == null || user.getRole().trim().isEmpty()) {
-            user.setRole("UNASSIGNED");
+            user.setRole(UserConstants.DEFAULT_ROLE);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

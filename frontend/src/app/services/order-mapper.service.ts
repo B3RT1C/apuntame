@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { OrderEventDTO } from '../models/order-event.model';
 import { Order } from '../models/order.model';
+import { PaymentStatus, PreparationStatus, DeliveryStatus } from '../models/order-status.model';
+import { User } from '../models/user.model';
+import { OrderItem } from '../models/order-item.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +14,9 @@ export class OrderMapperService {
     return {
       id: dto.id,
       table: dto.table,
-      paymentStatus: dto.paymentStatus as any,
-      preparationStatus: dto.preparationStatus as any,
-      deliveryStatus: dto.deliveryStatus as any,
+      paymentStatus: dto.paymentStatus as PaymentStatus,
+      preparationStatus: dto.preparationStatus as PreparationStatus,
+      deliveryStatus: dto.deliveryStatus as DeliveryStatus,
       creationDate: dto.creationDate,
       paidAt: dto.paidAt,
       preparedAt: dto.preparedAt,
@@ -26,17 +29,16 @@ export class OrderMapperService {
     };
   }
 
-  private mapUser(username: string) {
+  private mapUser(username: string): User {
     return {
       username: username,
       role: ''
     };
   }
 
-  private mapOrderItems(dto: OrderEventDTO) {
+  private mapOrderItems(dto: OrderEventDTO): OrderItem[] {
     return dto.orderItems.map(item => ({
       id: { orderId: dto.id, itemId: item.itemId },
-      order: null as any,
       item: {
         id: item.itemId,
         name: item.itemName,

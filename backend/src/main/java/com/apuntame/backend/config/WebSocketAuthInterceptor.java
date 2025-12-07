@@ -1,5 +1,6 @@
 package com.apuntame.backend.config;
 
+import com.apuntame.backend.constant.JwtConstants;
 import com.apuntame.backend.security.JwtUtil;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -28,14 +29,14 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String token = accessor.getFirstNativeHeader("Authorization");
+            String token = accessor.getFirstNativeHeader(JwtConstants.AUTHORIZATION_HEADER);
 
-            if (token == null || !token.startsWith("Bearer ")) {
+            if (token == null || !token.startsWith(JwtConstants.BEARER_PREFIX)) {
                 System.err.println("Conexión WebSocket rechazada: No se proporcionó token de autenticación");
                 throw new IllegalArgumentException("Token de autenticación requerido");
             }
 
-            token = token.substring(7);
+            token = token.substring(JwtConstants.BEARER_PREFIX.length());
 
             try {
                 String username = jwtUtil.extractUsername(token);

@@ -1,5 +1,6 @@
 package com.apuntame.backend.config;
 
+import com.apuntame.backend.constant.WebSocketConstants;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -19,13 +20,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker(WebSocketConstants.TOPIC_PREFIX);
+        config.setApplicationDestinationPrefixes(WebSocketConstants.APP_PREFIX);
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
+        registry.addEndpoint(WebSocketConstants.ENDPOINT)
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }

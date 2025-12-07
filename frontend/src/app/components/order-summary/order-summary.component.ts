@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { OrderItem } from '../../models/order-item.model';
 import { Item } from '../../models/item.model';
+import { OrderCalculationService } from '../../services/order-calculation.service';
 
 @Component({
   selector: 'app-order-summary',
@@ -18,6 +19,8 @@ import { Item } from '../../models/item.model';
   styleUrl: './order-summary.component.scss'
 })
 export class OrderSummaryComponent {
+  private orderCalculationService = inject(OrderCalculationService);
+
   @Input() orderItems: OrderItem[] = [];
   @Input() showTotal: boolean = true;
   @Input() editable: boolean = false;
@@ -25,12 +28,7 @@ export class OrderSummaryComponent {
   @Output() removeItem = new EventEmitter<OrderItem>();
 
   calculateTotal(): number {
-    if (!this.orderItems || this.orderItems.length === 0) {
-      return 0;
-    }
-    return this.orderItems.reduce((total, orderItem) => {
-      return total + (orderItem.item.price * orderItem.amount);
-    }, 0);
+    return this.orderCalculationService.calculateTotalFromItems(this.orderItems);
   }
 
   onAddItem(item: Item): void {

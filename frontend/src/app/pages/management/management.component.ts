@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -19,6 +19,10 @@ import { UserService } from '../../services/user.service';
 import { ItemService } from '../../services/item.service';
 import { CategoryService } from '../../services/category.service';
 import { SectionService } from '../../services/section.service';
+import { NotificationService } from '../../services/notification.service';
+import { ErrorHandlerService } from '../../services/error-handler.service';
+import { FORM_DIALOG_CONFIG, CONFIRM_DIALOG_CONFIG, FORM_DIALOG_SCROLLABLE_CONFIG } from '../../constants/dialog-config.constants';
+import { UI_MESSAGES } from '../../constants/ui-messages.constants';
 import { ConfirmDialogComponent, ConfirmDialogData } from './components/confirm-dialog/confirm-dialog.component';
 import { UserFormDialogComponent, UserFormDialogData } from './components/user-form-dialog/user-form-dialog.component';
 import { ItemFormDialogComponent, ItemFormDialogData } from './components/item-form-dialog/item-form-dialog.component';
@@ -51,7 +55,8 @@ export class ManagementComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private sectionService = inject(SectionService);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
+  private errorHandlerService = inject(ErrorHandlerService);
 
   categories: Category[] = [];
   sections: Section[] = [];
@@ -94,8 +99,7 @@ export class ManagementComponent implements OnInit {
         this.usersLoading = false;
       },
       error: (err) => {
-        console.error(err);
-        this.showError('Error al cargar usuarios');
+        this.errorHandlerService.handleHttpError(err, 'Error al cargar usuarios');
         this.usersLoading = false;
       }
     });
@@ -110,8 +114,7 @@ export class ManagementComponent implements OnInit {
         this.itemsLoading = false;
       },
       error: (err) => {
-        console.error(err);
-        this.showError('Error al cargar productos');
+        this.errorHandlerService.handleHttpError(err, 'Error al cargar productos');
         this.itemsLoading = false;
       }
     });
@@ -126,8 +129,7 @@ export class ManagementComponent implements OnInit {
         this.categoriesLoading = false;
       },
       error: (err) => {
-        console.error(err);
-        this.showError('Error al cargar categorías');
+        this.errorHandlerService.handleHttpError(err, 'Error al cargar categorías');
         this.categoriesLoading = false;
       }
     });
@@ -142,8 +144,7 @@ export class ManagementComponent implements OnInit {
         this.sectionsLoading = false;
       },
       error: (err) => {
-        console.error(err);
-        this.showError('Error al cargar secciones');
+        this.errorHandlerService.handleHttpError(err, 'Error al cargar secciones');
         this.sectionsLoading = false;
       }
     });
@@ -180,7 +181,7 @@ export class ManagementComponent implements OnInit {
 
   createUser(): void {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: {} as UserFormDialogData
     });
 
@@ -189,9 +190,9 @@ export class ManagementComponent implements OnInit {
         this.userService.createUser(result).subscribe({
           next: () => {
             this.loadUsers();
-            this.showSuccess('Usuario creado exitosamente');
+            this.notificationService.success(UI_MESSAGES.USER_CREATED);
           },
-          error: (err) => this.handleError(err, 'Error al crear usuario')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al crear usuario')
         });
       }
     });
@@ -199,7 +200,7 @@ export class ManagementComponent implements OnInit {
 
   editUser(user: User): void {
     const dialogRef = this.dialog.open(UserFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: { user } as UserFormDialogData
     });
 
@@ -208,9 +209,9 @@ export class ManagementComponent implements OnInit {
         this.userService.updateUser(user.username, result).subscribe({
           next: () => {
             this.loadUsers();
-            this.showSuccess('Usuario actualizado exitosamente');
+            this.notificationService.success(UI_MESSAGES.USER_UPDATED);
           },
-          error: (err) => this.handleError(err, 'Error al actualizar usuario')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al actualizar usuario')
         });
       }
     });
@@ -218,12 +219,12 @@ export class ManagementComponent implements OnInit {
 
   deleteUser(user: User): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      ...CONFIRM_DIALOG_CONFIG,
       data: {
-        title: 'Eliminar Usuario',
-        message: `¿Está seguro que desea eliminar el usuario "${user.username}"?`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar'
+        title: UI_MESSAGES.DELETE_USER_TITLE,
+        message: UI_MESSAGES.confirmDeleteUser(user.username),
+        confirmText: UI_MESSAGES.DELETE,
+        cancelText: UI_MESSAGES.CANCEL
       } as ConfirmDialogData
     });
 
@@ -232,9 +233,9 @@ export class ManagementComponent implements OnInit {
         this.userService.deleteUser(user.username).subscribe({
           next: () => {
             this.loadUsers();
-            this.showSuccess('Usuario eliminado exitosamente');
+            this.notificationService.success(UI_MESSAGES.USER_DELETED);
           },
-          error: (err) => this.handleError(err, 'Error al eliminar usuario', () => this.loadUsers())
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al eliminar usuario', () => this.loadUsers())
         });
       }
     });
@@ -242,9 +243,7 @@ export class ManagementComponent implements OnInit {
 
   createItem(): void {
     const dialogRef = this.dialog.open(ItemFormDialogComponent, {
-      width: '500px',
-      maxHeight: '80vh',
-      position: { top: '80px' },
+      ...FORM_DIALOG_SCROLLABLE_CONFIG,
       data: {
         allCategories: this.categories,
         allSections: this.sections
@@ -256,9 +255,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.createItem(result).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Producto creado exitosamente');
+            this.notificationService.success(UI_MESSAGES.ITEM_CREATED);
           },
-          error: (err) => this.handleError(err, 'Error al crear producto')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al crear producto')
         });
       }
     });
@@ -266,9 +265,7 @@ export class ManagementComponent implements OnInit {
 
   editItem(item: Item): void {
     const dialogRef = this.dialog.open(ItemFormDialogComponent, {
-      width: '500px',
-      maxHeight: '80vh',
-      position: { top: '80px' },
+      ...FORM_DIALOG_SCROLLABLE_CONFIG,
       data: {
         item,
         allCategories: this.categories,
@@ -281,9 +278,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.updateItem(item.id, result).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Producto actualizado exitosamente');
+            this.notificationService.success(UI_MESSAGES.ITEM_UPDATED);
           },
-          error: (err) => this.handleError(err, 'Error al actualizar producto')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al actualizar producto')
         });
       }
     });
@@ -291,12 +288,12 @@ export class ManagementComponent implements OnInit {
 
   deleteItem(item: Item): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      ...CONFIRM_DIALOG_CONFIG,
       data: {
-        title: 'Eliminar Producto',
-        message: `¿Está seguro que desea eliminar el producto "${item.name}"?`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar'
+        title: UI_MESSAGES.DELETE_ITEM_TITLE,
+        message: UI_MESSAGES.confirmDeleteItem(item.name),
+        confirmText: UI_MESSAGES.DELETE,
+        cancelText: UI_MESSAGES.CANCEL
       } as ConfirmDialogData
     });
 
@@ -305,9 +302,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.deleteItem(item.id).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Producto eliminado exitosamente');
+            this.notificationService.success(UI_MESSAGES.ITEM_DELETED);
           },
-          error: (err) => this.handleError(err, 'Error al eliminar producto', () => this.loadItems())
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al eliminar producto', () => this.loadItems())
         });
       }
     });
@@ -315,7 +312,7 @@ export class ManagementComponent implements OnInit {
 
   createCategory(): void {
     const dialogRef = this.dialog.open(CategoryFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: {} as CategoryFormDialogData
     });
 
@@ -324,9 +321,9 @@ export class ManagementComponent implements OnInit {
         this.categoryService.createCategory(result).subscribe({
           next: () => {
             this.loadCategories();
-            this.showSuccess('Categoría creada exitosamente');
+            this.notificationService.success(UI_MESSAGES.CATEGORY_CREATED);
           },
-          error: (err) => this.handleError(err, 'Error al crear categoría')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al crear categoría')
         });
       }
     });
@@ -334,7 +331,7 @@ export class ManagementComponent implements OnInit {
 
   editCategory(category: Category): void {
     const dialogRef = this.dialog.open(CategoryFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: { category } as CategoryFormDialogData
     });
 
@@ -344,9 +341,9 @@ export class ManagementComponent implements OnInit {
           next: () => {
             this.loadCategories();
             this.loadItems();
-            this.showSuccess('Categoría actualizada exitosamente');
+            this.notificationService.success(UI_MESSAGES.CATEGORY_UPDATED);
           },
-          error: (err) => this.handleError(err, 'Error al actualizar categoría')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al actualizar categoría')
         });
       }
     });
@@ -354,12 +351,12 @@ export class ManagementComponent implements OnInit {
 
   deleteCategory(category: Category): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      ...CONFIRM_DIALOG_CONFIG,
       data: {
-        title: 'Eliminar Categoría',
-        message: `¿Está seguro que desea eliminar la categoría "${category.name}"?`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar'
+        title: UI_MESSAGES.DELETE_CATEGORY_TITLE,
+        message: UI_MESSAGES.confirmDeleteCategory(category.name),
+        confirmText: UI_MESSAGES.DELETE,
+        cancelText: UI_MESSAGES.CANCEL
       } as ConfirmDialogData
     });
 
@@ -369,9 +366,9 @@ export class ManagementComponent implements OnInit {
           next: () => {
             this.loadCategories();
             this.loadItems();
-            this.showSuccess('Categoría eliminada exitosamente');
+            this.notificationService.success(UI_MESSAGES.CATEGORY_DELETED);
           },
-          error: (err) => this.handleError(err, 'Error al eliminar categoría', () => this.loadCategories())
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al eliminar categoría', () => this.loadCategories())
         });
       }
     });
@@ -379,7 +376,7 @@ export class ManagementComponent implements OnInit {
 
   createSection(): void {
     const dialogRef = this.dialog.open(SectionFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: {} as SectionFormDialogData
     });
 
@@ -388,9 +385,9 @@ export class ManagementComponent implements OnInit {
         this.sectionService.createSection(result).subscribe({
           next: () => {
             this.loadSections();
-            this.showSuccess('Sección creada exitosamente');
+            this.notificationService.success(UI_MESSAGES.SECTION_CREATED);
           },
-          error: (err) => this.handleError(err, 'Error al crear sección')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al crear sección')
         });
       }
     });
@@ -398,7 +395,7 @@ export class ManagementComponent implements OnInit {
 
   editSection(section: Section): void {
     const dialogRef = this.dialog.open(SectionFormDialogComponent, {
-      width: '500px',
+      ...FORM_DIALOG_CONFIG,
       data: { section } as SectionFormDialogData
     });
 
@@ -408,9 +405,9 @@ export class ManagementComponent implements OnInit {
           next: () => {
             this.loadSections();
             this.loadItems();
-            this.showSuccess('Sección actualizada exitosamente');
+            this.notificationService.success(UI_MESSAGES.SECTION_UPDATED);
           },
-          error: (err) => this.handleError(err, 'Error al actualizar sección')
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al actualizar sección')
         });
       }
     });
@@ -418,12 +415,12 @@ export class ManagementComponent implements OnInit {
 
   deleteSection(section: Section): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+      ...CONFIRM_DIALOG_CONFIG,
       data: {
-        title: 'Eliminar Sección',
-        message: `¿Está seguro que desea eliminar la sección "${section.name}"?`,
-        confirmText: 'Eliminar',
-        cancelText: 'Cancelar'
+        title: UI_MESSAGES.DELETE_SECTION_TITLE,
+        message: UI_MESSAGES.confirmDeleteSection(section.name),
+        confirmText: UI_MESSAGES.DELETE,
+        cancelText: UI_MESSAGES.CANCEL
       } as ConfirmDialogData
     });
 
@@ -433,9 +430,9 @@ export class ManagementComponent implements OnInit {
           next: () => {
             this.loadSections();
             this.loadItems();
-            this.showSuccess('Sección eliminada exitosamente');
+            this.notificationService.success(UI_MESSAGES.SECTION_DELETED);
           },
-          error: (err) => this.handleError(err, 'Error al eliminar sección', () => this.loadSections())
+          error: (err) => this.errorHandlerService.handleHttpError(err, 'Error al eliminar sección', () => this.loadSections())
         });
       }
     });
@@ -451,43 +448,5 @@ export class ManagementComponent implements OnInit {
     return this.items.filter(item =>
       item.sections?.some(s => s.id === sectionId)
     ).length;
-  }
-
-  private handleError(err: any, defaultMessage: string, reloadFn?: () => void): void {
-    console.error(err);
-
-    if (err.status === 404 && reloadFn) {
-      reloadFn();
-      this.showInfo('El elemento ya había sido eliminado. Tabla actualizada.');
-      return;
-    }
-
-    let message = defaultMessage;
-
-    if (err.error?.message) {
-      message = err.error.message;
-    } else if (err.status === 404) {
-      message = 'Recurso no encontrado';
-    } else if (err.status === 409) {
-      message = 'El recurso ya existe';
-    } else if (err.status === 400) {
-      message = err.error?.message || 'Datos inválidos proporcionados';
-    } else if (err.status === 500) {
-      message = 'Error del servidor, intente nuevamente';
-    }
-
-    this.showError(message);
-  }
-
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 3000 });
-  }
-
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 5000 });
-  }
-
-  private showInfo(message: string): void {
-    this.snackBar.open(message, 'Cerrar', { duration: 3000 });
   }
 }

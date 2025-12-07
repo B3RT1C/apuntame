@@ -1,5 +1,6 @@
 package com.apuntame.backend.config;
 
+import com.apuntame.backend.constant.DateTimeConstants;
 import com.apuntame.backend.enums.DeliveryStatus;
 import com.apuntame.backend.enums.PaymentStatus;
 import com.apuntame.backend.enums.PreparationStatus;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -44,7 +44,6 @@ public class DataInitializer implements CommandLineRunner {
     private final OrderService orderService;
     private final CategoryService categoryService;
     private final SectionService sectionService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public DataInitializer(UserRepository userRepository,
                           ItemRepository itemRepository,
@@ -226,9 +225,9 @@ public class DataInitializer implements CommandLineRunner {
     private void createCompletedOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 1", PaymentStatus.PAID, PreparationStatus.READY,
             DeliveryStatus.DELIVERED, now.minusHours(2), waiter);
-        order.setPaidAt(formatTime(now.minusHours(2).plusMinutes(5)));
-        order.setPreparedAt(formatTime(now.minusHours(2).plusMinutes(15)));
-        order.setDeliveredAt(formatTime(now.minusHours(2).plusMinutes(20)));
+        order.setPaidAt(now.minusHours(2).plusMinutes(5).format(DateTimeConstants.TIMESTAMP_FORMATTER));
+        order.setPreparedAt(now.minusHours(2).plusMinutes(15).format(DateTimeConstants.TIMESTAMP_FORMATTER));
+        order.setDeliveredAt(now.minusHours(2).plusMinutes(20).format(DateTimeConstants.TIMESTAMP_FORMATTER));
         order.setChargedBy(waiter);
         order.setPreparedBy(waiter);
         order.setDeliveredBy(waiter);
@@ -240,8 +239,8 @@ public class DataInitializer implements CommandLineRunner {
     private void createReadyForDeliveryOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 2", PaymentStatus.PAID, PreparationStatus.READY,
             DeliveryStatus.PENDING, now.minusMinutes(30), waiter);
-        order.setPaidAt(formatTime(now.minusMinutes(30).plusMinutes(2)));
-        order.setPreparedAt(formatTime(now.minusMinutes(10)));
+        order.setPaidAt(now.minusMinutes(30).plusMinutes(2).format(DateTimeConstants.TIMESTAMP_FORMATTER));
+        order.setPreparedAt(now.minusMinutes(10).format(DateTimeConstants.TIMESTAMP_FORMATTER));
         order.setChargedBy(waiter);
         order.setPreparedBy(waiter);
         addOrderItem(order, items.get(6), 1); // Entrecot
@@ -252,7 +251,7 @@ public class DataInitializer implements CommandLineRunner {
     private void createPendingPreparationOrder(List<Item> items, User waiter, LocalDateTime now) {
         Order order = createOrder("Mesa 3", PaymentStatus.PAID, PreparationStatus.PENDING,
             DeliveryStatus.PENDING, now.minusMinutes(20), waiter);
-        order.setPaidAt(formatTime(now.minusMinutes(20).plusMinutes(1)));
+        order.setPaidAt(now.minusMinutes(20).plusMinutes(1).format(DateTimeConstants.TIMESTAMP_FORMATTER));
         order.setChargedBy(waiter);
         addOrderItem(order, items.get(7), 2); // Pollo asado
         addOrderItem(order, items.get(15), 2); // Coca-Cola
@@ -291,7 +290,7 @@ public class DataInitializer implements CommandLineRunner {
         order.setPaymentStatus(paymentStatus);
         order.setPreparationStatus(preparationStatus);
         order.setDeliveryStatus(deliveryStatus);
-        order.setCreationDate(formatTime(creationDate));
+        order.setCreationDate(creationDate.format(DateTimeConstants.TIMESTAMP_FORMATTER));
         order.setTakenBy(takenBy);
         return order;
     }
@@ -301,9 +300,5 @@ public class DataInitializer implements CommandLineRunner {
         orderItem.setItem(item);
         orderItem.setAmount(amount);
         order.getOrderItems().add(orderItem);
-    }
-
-    private String formatTime(LocalDateTime dateTime) {
-        return dateTime.format(formatter);
     }
 }

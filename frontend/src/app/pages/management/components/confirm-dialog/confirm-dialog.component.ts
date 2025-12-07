@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { UI_MESSAGES } from '../../../../constants/ui-messages.constants';
 
 export interface ConfirmDialogData {
   title: string;
@@ -24,11 +25,11 @@ export class ConfirmDialogComponent {
   dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
 
   get confirmText(): string {
-    return this.data.confirmText || 'Confirmar';
+    return this.data.confirmText || UI_MESSAGES.CONFIRM;
   }
 
   get cancelText(): string {
-    return this.data.cancelText || 'Cancelar';
+    return this.data.cancelText || UI_MESSAGES.CANCEL;
   }
 
   onConfirm(): void {

@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { User } from '../../../../models/user.model';
+import { UI_MESSAGES } from '../../../../constants/ui-messages.constants';
 
 export interface UserFormDialogData {
   user?: User;
@@ -49,7 +50,7 @@ export class UserFormDialogComponent implements OnInit {
   }
 
   get title(): string {
-    return this.isEditMode ? 'Editar Usuario' : 'Crear Usuario';
+    return this.isEditMode ? UI_MESSAGES.EDIT_USER_TITLE : UI_MESSAGES.CREATE_USER_TITLE;
   }
 
   onSubmit(): void {

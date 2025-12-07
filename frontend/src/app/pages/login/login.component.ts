@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AuthService } from '../../services/auth.service';
 import { AppRoutes } from '../../constants/app-routes.constants';
+import { UI_MESSAGES } from '../../constants/ui-messages.constants';
 
 @Component({
   selector: 'app-login',
@@ -70,7 +71,7 @@ export class LoginComponent {
       error: (error) => {
         this.loading = false;
         this.loginForm.enable();
-        this.errorMessage = error.error?.message || 'Usuario o contraseña incorrectos';
+        this.errorMessage = error.error?.message || UI_MESSAGES.BAD_CREDENTIALS;
       }
     });
   }

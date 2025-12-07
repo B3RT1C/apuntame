@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(required = false) Integer limit) {
         List<User> users = userService.getAllUsers(limit);
         List<UserDTO> userDTOs = users.stream()
-                .map(user -> new UserDTO(user.getUsername(), user.getRole()))
+                .map(UserDTO::fromUser)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(userDTOs);
     }
@@ -33,22 +33,19 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
-        UserDTO userDTO = new UserDTO(createdUser.getUsername(), createdUser.getRole());
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.fromUser(createdUser));
     }
 
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username);
-        UserDTO userDTO = new UserDTO(user.getUsername(), user.getRole());
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(UserDTO.fromUser(user));
     }
 
     @PutMapping("/{username}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable String username, @RequestBody User userDetails) {
         User updatedUser = userService.updateUser(username, userDetails);
-        UserDTO userDTO = new UserDTO(updatedUser.getUsername(), updatedUser.getRole());
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(UserDTO.fromUser(updatedUser));
     }
 
     @DeleteMapping("/{username}")

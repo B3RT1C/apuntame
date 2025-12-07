@@ -1,5 +1,6 @@
 package com.apuntame.backend.service;
 
+import com.apuntame.backend.constant.DateTimeConstants;
 import com.apuntame.backend.constant.ErrorMessages;
 import com.apuntame.backend.dto.OrderListResponseDTO;
 import com.apuntame.backend.dto.OrderResponseDTO;
@@ -20,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -329,7 +329,6 @@ public class OrderService {
     }
 
     private String getCurrentTimestamp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.now().format(formatter);
+        return LocalDateTime.now().format(DateTimeConstants.TIMESTAMP_FORMATTER);
     }
 }

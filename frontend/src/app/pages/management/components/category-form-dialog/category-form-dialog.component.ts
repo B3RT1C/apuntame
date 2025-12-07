@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Category } from '../../../../models/category.model';
+import { UI_MESSAGES } from '../../../../constants/ui-messages.constants';
 
 export interface CategoryFormDialogData {
   category?: Category;
@@ -39,7 +40,7 @@ export class CategoryFormDialogComponent implements OnInit {
   }
 
   get title(): string {
-    return this.isEditMode ? 'Editar Categoría' : 'Crear Categoría';
+    return this.isEditMode ? UI_MESSAGES.EDIT_CATEGORY_TITLE : UI_MESSAGES.CREATE_CATEGORY_TITLE;
   }
 
   onSubmit(): void {

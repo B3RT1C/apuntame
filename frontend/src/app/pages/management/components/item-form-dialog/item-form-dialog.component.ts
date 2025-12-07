@@ -9,6 +9,7 @@ import { Item } from '../../../../models/item.model';
 import { Category } from '../../../../models/category.model';
 import { Section } from '../../../../models/section.model';
 import { GenericFilterComponent } from '../../../../components/generic-filter/generic-filter.component';
+import { UI_MESSAGES } from '../../../../constants/ui-messages.constants';
 
 export interface ItemFormDialogData {
   item?: Item;
@@ -56,7 +57,7 @@ export class ItemFormDialogComponent implements OnInit {
   }
 
   get title(): string {
-    return this.isEditMode ? 'Editar Artículo' : 'Crear Artículo';
+    return this.isEditMode ? UI_MESSAGES.EDIT_ITEM_TITLE : UI_MESSAGES.CREATE_ITEM_TITLE;
   }
 
   onCategoryIdsChange(ids: number[]): void {
