@@ -1,4 +1,3 @@
-export interface Section {
-  id: number;
-  name: string;
-}
+import { FilterableItem } from './filterable-item.model';
+
+export interface Section extends FilterableItem {}
