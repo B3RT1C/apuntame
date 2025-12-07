@@ -21,6 +21,13 @@ public class Section {
     @JsonIgnore
     private List<Item> items = new ArrayList<>();
 
+    @PreRemove
+    private void removeFromItems() {
+        for (Item item : items) {
+            item.getSections().remove(this);
+        }
+    }
+
     public Section() {
     }
 

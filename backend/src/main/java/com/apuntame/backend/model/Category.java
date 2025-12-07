@@ -21,6 +21,13 @@ public class Category {
     @JsonIgnore
     private List<Item> items = new ArrayList<>();
 
+    @PreRemove
+    private void removeFromItems() {
+        for (Item item : items) {
+            item.getCategories().remove(this);
+        }
+    }
+
     public Category() {
     }
 
