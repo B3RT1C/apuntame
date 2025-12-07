@@ -36,9 +36,9 @@ public class ErrorMessages {
     public static final String ORDER_DELIVERY_STATUS_INVALID = "Estado de entrega inválido";
 
     // OrderItem errors
-    public static final String ORDER_ITEM_NOT_FOUND = "Producto en pedido no encontrado (Order ID: %s, Item ID: %s)";
+    public static final String ORDER_ITEM_NOT_FOUND = "Producto no encontrado en el pedido (Pedido: %s, Producto: %s)";
     public static final String ORDER_ITEM_AMOUNT_INVALID = "La cantidad debe ser mayor que 0";
-    public static final String ORDER_ITEM_NULL = "El item no puede ser nulo en un OrderItem";
+    public static final String ORDER_ITEM_NULL = "El producto no puede ser nulo";
 
     // Generic
     public static final String INTERNAL_ERROR = "Ha ocurrido un error interno del servidor";

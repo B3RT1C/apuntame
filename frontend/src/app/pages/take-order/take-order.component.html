@@ -1,7 +1,7 @@
 <div class="take-order-container">
   <div class="header-container">
     <mat-form-field class="table-field">
-      <mat-label>Número de Mesa</mat-label>
+      <mat-label>Mesa</mat-label>
       <input matInput [(ngModel)]="tableNumber">
     </mat-form-field>
 
@@ -20,7 +20,7 @@
     <div class="items-section">
 
       @if (loading) {
-        <p>Cargando items...</p>
+        <p>Cargando productos...</p>
       } @else {
         <div class="items-grid"
              [class.compact]="cardSize === 'compact'"

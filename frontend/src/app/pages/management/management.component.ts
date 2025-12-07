@@ -111,7 +111,7 @@ export class ManagementComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.showError('Error al cargar artículos');
+        this.showError('Error al cargar productos');
         this.itemsLoading = false;
       }
     });
@@ -256,9 +256,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.createItem(result).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Artículo creado exitosamente');
+            this.showSuccess('Producto creado exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al crear artículo')
+          error: (err) => this.handleError(err, 'Error al crear producto')
         });
       }
     });
@@ -281,9 +281,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.updateItem(item.id, result).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Artículo actualizado exitosamente');
+            this.showSuccess('Producto actualizado exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al actualizar artículo')
+          error: (err) => this.handleError(err, 'Error al actualizar producto')
         });
       }
     });
@@ -293,8 +293,8 @@ export class ManagementComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: {
-        title: 'Eliminar Artículo',
-        message: `¿Está seguro que desea eliminar el artículo "${item.name}"?`,
+        title: 'Eliminar Producto',
+        message: `¿Está seguro que desea eliminar el producto "${item.name}"?`,
         confirmText: 'Eliminar',
         cancelText: 'Cancelar'
       } as ConfirmDialogData
@@ -305,9 +305,9 @@ export class ManagementComponent implements OnInit {
         this.itemService.deleteItem(item.id).subscribe({
           next: () => {
             this.loadItems();
-            this.showSuccess('Artículo eliminado exitosamente');
+            this.showSuccess('Producto eliminado exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al eliminar artículo', () => this.loadItems())
+          error: (err) => this.handleError(err, 'Error al eliminar producto', () => this.loadItems())
         });
       }
     });
