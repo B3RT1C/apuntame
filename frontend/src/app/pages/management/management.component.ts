@@ -234,7 +234,7 @@ export class ManagementComponent implements OnInit {
             this.loadUsers();
             this.showSuccess('Usuario eliminado exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al eliminar usuario')
+          error: (err) => this.handleError(err, 'Error al eliminar usuario', () => this.loadUsers())
         });
       }
     });
@@ -307,7 +307,7 @@ export class ManagementComponent implements OnInit {
             this.loadItems();
             this.showSuccess('Artículo eliminado exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al eliminar artículo')
+          error: (err) => this.handleError(err, 'Error al eliminar artículo', () => this.loadItems())
         });
       }
     });
@@ -371,7 +371,7 @@ export class ManagementComponent implements OnInit {
             this.loadItems();
             this.showSuccess('Categoría eliminada exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al eliminar categoría')
+          error: (err) => this.handleError(err, 'Error al eliminar categoría', () => this.loadCategories())
         });
       }
     });
@@ -435,7 +435,7 @@ export class ManagementComponent implements OnInit {
             this.loadItems();
             this.showSuccess('Sección eliminada exitosamente');
           },
-          error: (err) => this.handleError(err, 'Error al eliminar sección')
+          error: (err) => this.handleError(err, 'Error al eliminar sección', () => this.loadSections())
         });
       }
     });
@@ -453,8 +453,15 @@ export class ManagementComponent implements OnInit {
     ).length;
   }
 
-  private handleError(err: any, defaultMessage: string): void {
+  private handleError(err: any, defaultMessage: string, reloadFn?: () => void): void {
     console.error(err);
+
+    if (err.status === 404 && reloadFn) {
+      reloadFn();
+      this.showInfo('El elemento ya había sido eliminado. Tabla actualizada.');
+      return;
+    }
+
     let message = defaultMessage;
 
     if (err.error?.message) {
@@ -478,5 +485,9 @@ export class ManagementComponent implements OnInit {
 
   private showError(message: string): void {
     this.snackBar.open(message, 'Cerrar', { duration: 5000 });
+  }
+
+  private showInfo(message: string): void {
+    this.snackBar.open(message, 'Cerrar', { duration: 3000 });
   }
 }

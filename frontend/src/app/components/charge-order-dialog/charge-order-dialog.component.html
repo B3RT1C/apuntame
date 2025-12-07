@@ -9,15 +9,17 @@
   <app-order-summary
     [orderItems]="order.orderItems"
     [showTotal]="true"
-    [editable]="false">
+    [editable]="true"
+    (addItem)="onAddItem($event)"
+    (removeItem)="onRemoveItem($event)">
   </app-order-summary>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-raised-button color="warn" (click)="cancelOrder()">
-    Cancelar Pedido
+  <button mat-raised-button (click)="close()">
+    Cancelar
   </button>
-  <button mat-raised-button color="primary" (click)="payOrder()">
-    Pagar Pedido
+  <button mat-raised-button color="primary" (click)="confirm()" [disabled]="!hasChanges()">
+    Confirmar
   </button>
 </mat-dialog-actions>

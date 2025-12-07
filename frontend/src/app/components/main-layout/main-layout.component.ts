@@ -31,7 +31,7 @@ export class MainLayoutComponent {
   menuItems: ListItem[] = [
     { label: 'Inicio', route: AppRoutes.ROUTE.HOME, icon: 'home' },
     { label: 'Tomar pedidos', route: AppRoutes.ROUTE.TAKE_ORDER, icon: 'add_shopping_cart' },
-    { label: 'Cobrar pedidos', route: AppRoutes.ROUTE.CHARGE_ORDER, icon: 'payments' },
+    { label: 'Editar pedido', route: AppRoutes.ROUTE.CHARGE_ORDER, icon: 'edit' },
     { label: 'Vista pedidos', route: AppRoutes.ROUTE.VIEW_ORDERS, icon: 'list_alt' },
     { label: 'Gestión', route: AppRoutes.ROUTE.MANAGEMENT, icon: 'settings' }
   ];

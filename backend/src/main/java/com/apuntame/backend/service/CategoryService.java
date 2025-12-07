@@ -2,6 +2,7 @@ package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
 import com.apuntame.backend.exception.InvalidDataException;
+import com.apuntame.backend.exception.DuplicateResourceException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Category;
 import com.apuntame.backend.repository.CategoryRepository;
@@ -24,6 +25,9 @@ public class CategoryService {
 
     public Category createCategory(Category category) {
         validateCategory(category);
+        if (categoryRepository.existsByName(category.getName().trim())) {
+            throw new DuplicateResourceException(String.format(ErrorMessages.CATEGORY_ALREADY_EXISTS, category.getName()));
+        }
         return categoryRepository.save(category);
     }
 
@@ -36,6 +40,9 @@ public class CategoryService {
         Category category = getCategoryById(id);
 
         if (categoryDetails.getName() != null && !categoryDetails.getName().trim().isEmpty()) {
+            if (categoryRepository.existsByNameAndIdNot(categoryDetails.getName().trim(), id)) {
+                throw new DuplicateResourceException(String.format(ErrorMessages.CATEGORY_ALREADY_EXISTS, categoryDetails.getName()));
+            }
             category.setName(categoryDetails.getName());
         }
 

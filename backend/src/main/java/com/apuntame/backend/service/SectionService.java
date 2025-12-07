@@ -2,6 +2,7 @@ package com.apuntame.backend.service;
 
 import com.apuntame.backend.constant.ErrorMessages;
 import com.apuntame.backend.exception.InvalidDataException;
+import com.apuntame.backend.exception.DuplicateResourceException;
 import com.apuntame.backend.exception.ResourceNotFoundException;
 import com.apuntame.backend.model.Section;
 import com.apuntame.backend.repository.SectionRepository;
@@ -24,6 +25,9 @@ public class SectionService {
 
     public Section createSection(Section section) {
         validateSection(section);
+        if (sectionRepository.existsByName(section.getName().trim())) {
+            throw new DuplicateResourceException(String.format(ErrorMessages.SECTION_ALREADY_EXISTS, section.getName()));
+        }
         return sectionRepository.save(section);
     }
 
@@ -36,6 +40,9 @@ public class SectionService {
         Section section = getSectionById(id);
 
         if (sectionDetails.getName() != null && !sectionDetails.getName().trim().isEmpty()) {
+            if (sectionRepository.existsByNameAndIdNot(sectionDetails.getName().trim(), id)) {
+                throw new DuplicateResourceException(String.format(ErrorMessages.SECTION_ALREADY_EXISTS, sectionDetails.getName()));
+            }
             section.setName(sectionDetails.getName());
         }
 

@@ -21,15 +21,16 @@ public class ErrorMessages {
     // Category errors
     public static final String CATEGORY_NOT_FOUND = "Categoría no encontrada con id: %s";
     public static final String CATEGORY_NAME_EMPTY = "El nombre de la categoría no puede estar vacío";
+    public static final String CATEGORY_ALREADY_EXISTS = "Ya existe una categoría con el nombre '%s'";
 
     // Section errors
     public static final String SECTION_NOT_FOUND = "Sección no encontrada con id: %s";
     public static final String SECTION_NAME_EMPTY = "El nombre de la sección no puede estar vacío";
+    public static final String SECTION_ALREADY_EXISTS = "Ya existe una sección con el nombre '%s'";
 
     // Order errors
     public static final String ORDER_NOT_FOUND = "Pedido no encontrado con id: %s";
-    //TODO
-    //public static final String ORDER_TABLE_EMPTY = "El número de mesa no puede estar vacío";
+    public static final String ORDER_TABLE_EMPTY = "El número de mesa no puede estar vacío";
     public static final String ORDER_PAYMENT_STATUS_INVALID = "Estado de pago inválido";
     public static final String ORDER_PREPARATION_STATUS_INVALID = "Estado de preparación inválido";
     public static final String ORDER_DELIVERY_STATUS_INVALID = "Estado de entrega inválido";

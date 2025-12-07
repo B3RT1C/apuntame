@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>Configuración de Pedidos</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <mat-tab label="Filtro">
+      <div class="tab-content">
+        <mat-form-field appearance="outline">
+          <mat-label>ID</mat-label>
+          <input matInput [(ngModel)]="filterConfig.filterId" placeholder="Buscar por ID">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Pago</mat-label>
+          <mat-select [(ngModel)]="filterConfig.filterPaymentStatus">
+            @for (option of paymentStatusOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Preparación</mat-label>
+          <mat-select [(ngModel)]="filterConfig.filterPreparationStatus">
+            @for (option of preparationStatusOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado de Entrega</mat-label>
+          <mat-select [(ngModel)]="filterConfig.filterDeliveryStatus">
+            @for (option of deliveryStatusOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Total mínimo (€)</mat-label>
+          <input matInput [(ngModel)]="minTotalText" placeholder="Ej: 4,50">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Total máximo (€)</mat-label>
+          <input matInput [(ngModel)]="maxTotalText" placeholder="Ej: 20,00">
+        </mat-form-field>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Ordenar">
+      <div class="tab-content">
+        <div class="sort-section">
+          <label class="section-label">Ordenar por</label>
+          <mat-radio-group [(ngModel)]="filterConfig.sortBy" class="radio-group">
+            @for (option of sortByOptions; track option.value) {
+              <mat-radio-button [value]="option.value">{{ option.label }}</mat-radio-button>
+            }
+          </mat-radio-group>
+        </div>
+
+        <div class="sort-section">
+          <label class="section-label">Dirección</label>
+          <mat-radio-group [(ngModel)]="filterConfig.sortOrder" class="radio-group">
+            @for (option of sortOrderOptions; track option.value) {
+              <mat-radio-button [value]="option.value">{{ option.label }}</mat-radio-button>
+            }
+          </mat-radio-group>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClear()">Limpiar</button>
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onApply()">Aplicar</button>
+</mat-dialog-actions>

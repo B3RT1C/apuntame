@@ -1,5 +1,45 @@
-mat-card {
-  margin: 20px;
+.edit-order-container {
+  padding: 20px;
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .settings-button {
+      color: rgba(0, 0, 0, 0.54);
+      transition: all 0.2s;
+
+      &:hover {
+        color: #1976d2;
+      }
+
+      &.active {
+        color: #1976d2;
+        background-color: rgba(25, 118, 210, 0.1);
+      }
+    }
+  }
+
+  .loading-message,
+  .empty-message {
+    text-align: center;
+    padding: 40px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 16px;
+  }
 }
 
 .table-container {
@@ -11,7 +51,6 @@ mat-card {
 
 .orders-table {
   width: 100%;
-  margin-top: 20px;
   min-width: 600px;
 }
 
@@ -35,13 +74,19 @@ mat-card {
 }
 
 @media (max-width: 768px) {
-  mat-card {
-    margin: 5px;
+  .edit-order-container {
+    padding: 10px;
+
+    .header-container {
+      h2 {
+        font-size: 20px;
+      }
+    }
   }
 
   .table-container {
-    margin: 0 -16px;
-    padding: 0 16px;
+    margin: 0 -10px;
+    padding: 0 10px;
   }
 
   .orders-table {

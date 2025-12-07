@@ -14,23 +14,19 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // Permitir credenciales (cookies, tokens de autenticación)
         config.setAllowCredentials(true);
 
-        // Orígenes permitidos - Solo red local (SEGURO)
-        config.addAllowedOriginPattern("http://localhost");        // Producción Docker (puerto 80)
-        config.addAllowedOriginPattern("http://localhost:*");      // Desarrollo local (otros puertos)
-        config.addAllowedOriginPattern("http://127.0.0.1");        // Alternativo (puerto 80)
-        config.addAllowedOriginPattern("http://127.0.0.1:*");      // Alternativo (otros puertos)
-        config.addAllowedOriginPattern("http://192.168.*.*");      // Red WiFi local (puerto 80)
-        config.addAllowedOriginPattern("http://192.168.*.*:*");    // Red WiFi local (otros puertos)
-        config.addAllowedOriginPattern("http://10.*.*.*");         // Red local clase A (puerto 80)
-        config.addAllowedOriginPattern("http://10.*.*.*:*");       // Red local clase A (otros puertos)
+        config.addAllowedOriginPattern("http://localhost");
+        config.addAllowedOriginPattern("http://localhost:*");
+        config.addAllowedOriginPattern("http://127.0.0.1");
+        config.addAllowedOriginPattern("http://127.0.0.1:*");
+        config.addAllowedOriginPattern("http://192.168.*.*");
+        config.addAllowedOriginPattern("http://192.168.*.*:*");
+        config.addAllowedOriginPattern("http://10.*.*.*");
+        config.addAllowedOriginPattern("http://10.*.*.*:*");
 
-        // Headers permitidos - Permitir todos los headers comunes
         config.addAllowedHeader("*");
 
-        // Métodos HTTP permitidos - Todos los métodos REST estándar
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
@@ -38,11 +34,10 @@ public class CorsConfig {
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("PATCH");
 
-        // Headers expuestos - Headers que el frontend puede leer de la respuesta
         config.addExposedHeader("Authorization");
         config.addExposedHeader("Content-Type");
 
-        // Aplicar configuración CORS a todas las rutas de la API
+        // Apply CORS configuration to all API routes
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);

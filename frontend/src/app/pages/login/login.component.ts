@@ -44,7 +44,7 @@ export class LoginComponent {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
-      rememberMe: [false] // Checkbox sin validación
+      rememberMe: [false]
     });
   }
 
