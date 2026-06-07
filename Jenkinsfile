@@ -60,11 +60,7 @@ pipeline {
 
                 stage('E2E tests - Playwright') {
                     steps {
-                        dir('e2e') {
-                            sh 'npm ci'
-                            sh 'npx playwright install --with-deps chromium'
-                            sh 'npm run test:ci'
-                        }
+                        sh './e2e/scripts/test-docker.sh'
                     }
                     post {
                         always {
