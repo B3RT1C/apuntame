@@ -1,0 +1,19 @@
+{
+  "name": "apuntame-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bddgen": "bddgen",
+    "test": "bddgen && playwright test",
+    "test:ci": "bddgen && playwright test --reporter=list,html,junit",
+    "test:headed": "bddgen && playwright test --headed",
+    "test:ui": "bddgen && playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.0",
+    "playwright-bdd": "^8.4.1",
+    "typescript": "^5.7.2"
+  }
+}
