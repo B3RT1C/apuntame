@@ -6,17 +6,18 @@ JWT_SECRET_FILE="/app/secrets/jwt.secret"
 # Create secrets directory if it doesn't exist
 mkdir -p /app/secrets
 
-# Check if JWT secret already exists
-if [ ! -f "$JWT_SECRET_FILE" ]; then
+# Prefer JWT from environment (CI/tests), then persisted file, then auto-generate
+if [ -n "$JWT_SECRET" ]; then
+    echo "Using JWT secret from environment variable"
+elif [ -f "$JWT_SECRET_FILE" ]; then
+    echo "JWT secret already exists. Loading from $JWT_SECRET_FILE"
+    JWT_SECRET=$(cat "$JWT_SECRET_FILE")
+else
     echo "No JWT secret found. Generating new JWT secret..."
-    # Generate random 64-character hex string
-    JWT_SECRET=$(head -c 32 /dev/urandom | xxd -p -c 64)
+    JWT_SECRET=$(head -c 32 /dev/urandom | base64 | tr -d '\n')
     echo "$JWT_SECRET" > "$JWT_SECRET_FILE"
     chmod 600 "$JWT_SECRET_FILE"
     echo "JWT secret generated and saved to $JWT_SECRET_FILE"
-else
-    echo "JWT secret already exists. Loading from $JWT_SECRET_FILE"
-    JWT_SECRET=$(cat "$JWT_SECRET_FILE")
 fi
 
 # Export JWT secret as environment variable
