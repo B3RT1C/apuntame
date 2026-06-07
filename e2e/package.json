@@ -6,6 +6,7 @@
     "bddgen": "bddgen",
     "test": "bddgen && playwright test",
     "test:ci": "bddgen && playwright test --reporter=list,html,junit",
+    "test:docker": "bash scripts/test-docker.sh",
     "test:headed": "bddgen && playwright test --headed",
     "test:ui": "bddgen && playwright test --ui",
     "test:report": "playwright show-report"
