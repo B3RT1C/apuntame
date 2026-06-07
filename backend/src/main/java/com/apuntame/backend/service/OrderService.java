@@ -19,6 +19,7 @@ import com.apuntame.backend.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,6 +46,7 @@ public class OrderService {
         return orderRepository.findAllWithItems(Pageable.unpaged()).getContent();
     }
 
+    @Transactional
     public Order createOrder(Order order) {
         validateOrder(order);
         order.setCreationDate(getCurrentTimestamp());
@@ -87,6 +89,7 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id)));
     }
 
+    @Transactional
     public Order updateOrder(Integer id, Order orderDetails) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id)));
@@ -134,6 +137,7 @@ public class OrderService {
         }
     }
 
+    @Transactional
     public Order updatePaymentStatus(Integer orderId, PaymentStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_PAYMENT_STATUS_INVALID);
         Order order = findOrderById(orderId);
@@ -145,6 +149,7 @@ public class OrderService {
         return saveAndNotifyUpdate(order);
     }
 
+    @Transactional
     public Order updatePreparationStatus(Integer orderId, PreparationStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_PREPARATION_STATUS_INVALID);
         Order order = findOrderById(orderId);
@@ -156,6 +161,7 @@ public class OrderService {
         return saveAndNotifyUpdate(order);
     }
 
+    @Transactional
     public Order updateDeliveryStatus(Integer orderId, DeliveryStatus newStatus, User currentUser) {
         validateStatusNotNull(newStatus, ErrorMessages.ORDER_DELIVERY_STATUS_INVALID);
         Order order = findOrderById(orderId);
@@ -222,6 +228,7 @@ public class OrderService {
         return updatedOrder;
     }
 
+    @Transactional
     public void deleteOrder(Integer id) {
         if (!orderRepository.existsById(id)) {
             throw new ResourceNotFoundException(String.format(ErrorMessages.ORDER_NOT_FOUND, id));
@@ -273,6 +280,7 @@ public class OrderService {
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
+    @Transactional
     public OrderResponseDTO updateMultipleStatuses(Integer orderId, PaymentStatus paymentStatus,
                                                     PreparationStatus preparationStatus,
                                                     DeliveryStatus deliveryStatus,
@@ -301,6 +309,7 @@ public class OrderService {
         return new OrderResponseDTO(updatedOrder, getCurrentTimestamp());
     }
 
+    @Transactional
     public Order prepareItems(Integer orderId, List<Integer> itemIds, User currentUser) {
         Order order = findOrderById(orderId);
 

@@ -23,12 +23,14 @@ import com.apuntame.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@Transactional
 public class DataInitializer implements CommandLineRunner {
 
     @Value("${apuntame.initialize-demo-data:false}")
