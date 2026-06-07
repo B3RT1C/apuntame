@@ -27,6 +27,9 @@ COPY --from=builder /app/target/*.jar app.jar
 COPY entrypoint.sh /app/entrypoint.sh
 RUN sed -i 's/\r$//' /app/entrypoint.sh
 
+# Healthchecks in compose/Dockerfile need wget (not included in JRE alpine)
+RUN apk add --no-cache wget
+
 # Create secrets directory and set permissions
 RUN mkdir -p /app/secrets && \
     chown -R appuser:appuser /app && \
