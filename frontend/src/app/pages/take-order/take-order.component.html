@@ -1,8 +1,8 @@
-<div class="take-order-container">
+<div class="take-order-container" data-testid="take-order-page">
   <div class="header-container">
     <mat-form-field class="table-field">
       <mat-label>Mesa</mat-label>
-      <input matInput [(ngModel)]="tableNumber">
+      <input matInput data-testid="table-input" [(ngModel)]="tableNumber">
     </mat-form-field>
 
     <div class="action-buttons">
@@ -28,6 +28,7 @@
           @for (item of items; track item.id) {
             <mat-card (click)="addItemToOrder(item)"
                       class="item-card"
+                      [attr.data-testid]="'item-card-' + item.name"
                       [class.compact]="cardSize === 'compact'"
                       [class.large]="cardSize === 'large'">
               <mat-card-content>
@@ -54,7 +55,7 @@
         </app-order-summary>
 
         <div class="footer">
-          <button mat-raised-button color="primary" (click)="sendOrder()"
+          <button mat-raised-button color="primary" data-testid="send-order-btn" (click)="sendOrder()"
                   [disabled]="orderItems.length === 0 || !tableNumber">
             Enviar Pedido
           </button>

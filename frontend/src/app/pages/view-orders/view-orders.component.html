@@ -1,4 +1,4 @@
-<div class="view-orders-container">
+<div class="view-orders-container" data-testid="view-orders-page">
   <div class="header-container">
     <div class="action-buttons">
       <button mat-icon-button (click)="toggleCompactMode()" class="compact-button" [class.active]="compactMode !== 'normal'">
@@ -15,9 +15,9 @@
   } @else if (orders.length === 0) {
     <p class="empty-message">No hay pedidos pendientes.</p>
   } @else {
-    <div class="orders-grid" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'">
+    <div class="orders-grid" data-testid="view-orders-grid" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'">
       @for (order of orders; track order.id) {
-        <mat-card class="order-card" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'" (click)="onOrderClick(order)">
+        <mat-card class="order-card" [attr.data-testid]="'order-card-' + order.table" [class.compact]="compactMode === 'compact'" [class.extra-compact]="compactMode === 'extra-compact'" (click)="onOrderClick(order)">
           <mat-card-header>
             <mat-card-title>
               <div class="order-header">

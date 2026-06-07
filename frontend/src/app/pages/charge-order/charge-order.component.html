@@ -1,4 +1,4 @@
-<div class="edit-order-container">
+<div class="edit-order-container" data-testid="edit-order-page">
   <div class="header-container">
     <h2>Editar Pedido</h2>
     <div class="action-buttons">
@@ -14,7 +14,7 @@
     <p class="empty-message">No hay pedidos</p>
   } @else {
     <div class="table-container">
-      <table mat-table [dataSource]="filteredOrders" class="orders-table">
+      <table mat-table [dataSource]="filteredOrders" class="orders-table" data-testid="edit-order-table">
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>ID</th>
           <td mat-cell *matCellDef="let order">{{ order.id }}</td>
@@ -56,7 +56,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selectOrder(row)" class="clickable-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selectOrder(row)" class="clickable-row" [attr.data-testid]="'order-row-' + row.table"></tr>
       </table>
     </div>
   }

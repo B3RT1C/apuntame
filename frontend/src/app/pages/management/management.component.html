@@ -1,4 +1,4 @@
-<div class="management-container">
+<div class="management-container" data-testid="management-page">
   <mat-tab-group>
     <mat-tab label="Categorías">
       <div class="tab-content">
@@ -8,7 +8,7 @@
             <input matInput [(ngModel)]="categorySearchText" (keyup)="applyFilterCategories()" placeholder="Buscar por nombre">
             <mat-icon matSuffix>search</mat-icon>
           </mat-form-field>
-          <button mat-raised-button color="primary" (click)="createCategory()">
+          <button mat-raised-button color="primary" data-testid="create-category-btn" (click)="createCategory()">
             <mat-icon>add</mat-icon>
             Crear Categoría
           </button>

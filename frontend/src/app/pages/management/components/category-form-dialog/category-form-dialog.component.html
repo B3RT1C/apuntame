@@ -4,7 +4,7 @@
   <form [formGroup]="categoryForm">
     <mat-form-field appearance="outline">
       <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" required>
+      <input matInput data-testid="category-name-input" formControlName="name" required>
       @if (categoryForm.get('name')?.hasError('required')) {
         <mat-error>El nombre es requerido</mat-error>
       }
@@ -17,7 +17,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancelar</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="categoryForm.invalid">
+  <button mat-raised-button color="primary" data-testid="category-submit-btn" (click)="onSubmit()" [disabled]="categoryForm.invalid">
     {{ isEditMode ? 'Actualizar' : 'Crear' }}
   </button>
 </mat-dialog-actions>

@@ -19,7 +19,7 @@
   <button mat-raised-button (click)="close()">
     Cancelar
   </button>
-  <button mat-raised-button color="primary" (click)="confirm()" [disabled]="!hasChanges()">
+  <button mat-raised-button color="primary" data-testid="edit-order-confirm-btn" (click)="confirm()" [disabled]="!hasChanges()">
     Confirmar
   </button>
 </mat-dialog-actions>
