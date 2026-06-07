@@ -28,10 +28,18 @@ node_modules/ pycache/ *.pyc
 # Ignorar archivos de IDEs
 
 .idea/ *.iml *.ipr *.iws
+.cursor/
 
 # Ignorar builds y artefactos
 
 dist/ build/
+
+# Artefactos de tests E2E
+e2e/node_modules/
+e2e/.features-gen/
+e2e/playwright-report/
+e2e/test-results/
+e2e/reports/
 
 # Ignorar archivos de claude
 
