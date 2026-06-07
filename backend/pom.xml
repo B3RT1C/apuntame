@@ -141,9 +141,6 @@
 							<includes>
 								<include>**/KarateTestRunner.java</include>
 							</includes>
-							<systemPropertyVariables>
-								<karate.options>--threads 4</karate.options>
-							</systemPropertyVariables>
 						</configuration>
 						<executions>
 							<execution>

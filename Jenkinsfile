@@ -46,7 +46,7 @@ pipeline {
                         always {
                             junit allowEmptyResults: true, testResults: 'backend/target/failsafe-reports/*.xml'
                             publishHTML(target: [
-                                allowMissing: true,
+                                allowMissing: false,
                                 alwaysLinkToLastBuild: true,
                                 keepAll: true,
                                 reportDir: 'backend/target/karate-reports',
