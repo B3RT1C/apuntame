@@ -1,0 +1,73 @@
+# Stack para pruebas automatizadas (CI y local).
+# Construye backend y frontend desde el código del commit actual (no imágenes GHCR).
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: apuntame-test-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_test:/var/lib/postgresql/data
+    networks:
+      - apuntame-test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: "no"
+
+  backend:
+    build: ./backend
+    container_name: apuntame-test-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      INITIALIZE_DEMO_DATA: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - apuntame-test-network
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
+    restart: "no"
+
+  frontend:
+    build: ./frontend
+    container_name: apuntame-test-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - apuntame-test-network
+    ports:
+      - "80:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: "no"
+
+volumes:
+  postgres_test:
+
+networks:
+  apuntame-test-network:
+    driver: bridge
