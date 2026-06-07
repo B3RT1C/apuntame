@@ -27,6 +27,11 @@ pipeline {
                 sh 'docker compose -f docker-compose.test.yml up -d --build'
                 sh './scripts/wait-for-services.sh'
             }
+            post {
+                failure {
+                    sh 'docker compose -f docker-compose.test.yml logs --tail=100 backend frontend postgres || true'
+                }
+            }
         }
 
         stage('Tests') {
