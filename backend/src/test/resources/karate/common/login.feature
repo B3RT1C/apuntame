@@ -2,7 +2,7 @@
 Feature: Helper de login reutilizable
 
   Scenario:
-    Given url baseUrl + '/api/auth/login'
+    Given path '/api/auth/login'
     And request { username: '#(user)', password: '#(pass)' }
     When method post
     Then status 200

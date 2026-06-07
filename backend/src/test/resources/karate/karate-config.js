@@ -12,6 +12,7 @@ function fn() {
     config.baseUrl = 'http://localhost:8080';
   }
 
+  karate.configure('url', config.baseUrl);
   karate.log('Karate env:', env, '| baseUrl:', config.baseUrl);
   return config;
 }
