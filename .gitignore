@@ -44,3 +44,7 @@ e2e/reports/
 # Ignorar archivos de claude
 
 .claude
+
+# Documentación local (guías de setup, notas)
+
+docs/
