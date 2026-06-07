@@ -31,8 +31,7 @@ When('pulso {string}', async ({ page }, buttonName: string) => {
 });
 
 Then('veo la pagina de inicio', async ({ page }) => {
-  await expect(page.locator('app-home')).toBeVisible();
-  await expect(page.getByText('Has iniciado sesión correctamente.')).toBeVisible();
+  await expect(page.getByTestId('take-order-page')).toBeVisible();
 });
 
 Then('veo el mensaje de error de login', async ({ page }) => {
@@ -46,5 +45,5 @@ Given('he iniciado sesion como {string}', async ({ page }, username: string) => 
   await page.getByTestId('login-username').fill(username);
   await page.getByTestId('login-password').fill(password);
   await page.getByTestId('login-submit').click();
-  await expect(page.locator('app-home')).toBeVisible();
+  await expect(page.getByTestId('take-order-page')).toBeVisible();
 });

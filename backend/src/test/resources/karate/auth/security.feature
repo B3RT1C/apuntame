@@ -1,5 +1,8 @@
 Feature: Seguridad API
 
+  Background:
+    * url baseUrl
+
   Scenario: Acceso sin token JWT
     Given path '/api/orders'
     When method get

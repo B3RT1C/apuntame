@@ -1,6 +1,7 @@
 Feature: Gestion de usuarios
 
   Background:
+    * url baseUrl
     * def login = callonce read('classpath:karate/common/login.feature') { user: '#(adminUser)', pass: '#(adminPass)' }
     * configure headers = { Authorization: '#("Bearer " + login.token)' }
 

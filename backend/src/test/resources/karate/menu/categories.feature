@@ -1,6 +1,7 @@
 Feature: CRUD de categorias
 
   Background:
+    * url baseUrl
     * def login = callonce read('classpath:karate/common/login.feature') { user: '#(adminUser)', pass: '#(adminPass)' }
     * configure headers = { Authorization: '#("Bearer " + login.token)' }
     * def categoryName = 'KarateCat-' + java.util.UUID.randomUUID()

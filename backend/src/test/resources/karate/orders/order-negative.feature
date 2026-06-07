@@ -1,6 +1,7 @@
 Feature: Casos negativos de pedidos
 
   Background:
+    * url baseUrl
     * def login = callonce read('classpath:karate/common/login.feature') { user: '#(waiterUser)', pass: '#(waiterPass)' }
     * configure headers = { Authorization: '#("Bearer " + login.token)' }
 

@@ -1,6 +1,9 @@
 @ignore
 Feature: Helper de login reutilizable
 
+  Background:
+    * url baseUrl
+
   Scenario:
     Given path '/api/auth/login'
     And request { username: '#(user)', password: '#(pass)' }

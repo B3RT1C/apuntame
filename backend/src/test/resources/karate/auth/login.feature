@@ -1,5 +1,8 @@
 Feature: Autenticacion API
 
+  Background:
+    * url baseUrl
+
   Scenario: Login exitoso como admin
     Given path '/api/auth/login'
     And request { username: '#(adminUser)', password: '#(adminPass)' }
