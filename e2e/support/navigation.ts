@@ -14,6 +14,13 @@ export async function navigateToSection(page: Page, section: string): Promise<vo
     throw new Error(`Sección de navegación desconocida: ${section}`);
   }
 
-  await page.getByRole('button', { name: section }).click();
+  const bottomNavButton = page.getByRole('button', { name: section });
+  if (await bottomNavButton.isVisible()) {
+    await bottomNavButton.click();
+  } else {
+    await page.locator('app-toolbar button[mat-icon-button]').first().click();
+    await page.locator('mat-list-item').filter({ hasText: section }).click();
+  }
+
   await page.getByTestId(pageTestId).waitFor({ state: 'visible' });
 }

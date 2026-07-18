@@ -10,11 +10,23 @@ async function getAuthToken(
   username: string,
   password: string,
 ): Promise<string> {
-  const response = await request.post(`${API_BASE}/auth/login`, {
-    data: { username, password },
-  });
-  const body = await response.json();
-  return body.token;
+  let lastStatus = 0;
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const response = await request.post(`${API_BASE}/auth/login`, {
+      data: { username, password },
+    });
+    lastStatus = response.status();
+
+    if (response.ok()) {
+      const body = await response.json();
+      return body.token;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+
+  throw new Error(`Login failed for ${username} (last status: ${lastStatus})`);
 }
 
 Given(

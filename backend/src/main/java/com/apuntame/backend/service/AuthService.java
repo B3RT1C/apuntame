@@ -9,6 +9,7 @@ import com.apuntame.backend.repository.ActiveTokenRepository;
 import com.apuntame.backend.repository.UserRepository;
 import com.apuntame.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,8 +68,15 @@ public class AuthService {
 
         if (existingTokenOpt.isPresent()) {
             return handleExistingToken(existingTokenOpt.get());
-        } else {
+        }
+
+        try {
             return createNewToken(username);
+        } catch (DataIntegrityViolationException ex) {
+            return handleExistingToken(
+                    activeTokenRepository.findById(username)
+                            .orElseThrow(() -> ex)
+            );
         }
     }
 

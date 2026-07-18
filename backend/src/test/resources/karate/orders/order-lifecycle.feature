@@ -22,7 +22,7 @@ Feature: Ciclo de vida de pedido
     * def orderId = response.order.id
 
     Given path '/api/orders/', orderId, '/payment-status'
-    And request 'PAID'
+    And request '"PAID"'
     And header Content-Type = 'application/json'
     When method patch
     Then status 200
