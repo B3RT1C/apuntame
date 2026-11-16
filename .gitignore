@@ -36,3 +36,9 @@ dist/ build/
 # Ignorar archivos de claude
 
 .claude
+# Foglamp scan (editToken is a secret)
+.foglamp/
+# Editor / agent local files
+.cursor/
+# Playwright generated features
+.features-gen/
