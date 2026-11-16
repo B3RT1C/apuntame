@@ -42,3 +42,6 @@ dist/ build/
 .cursor/
 # Playwright generated features
 .features-gen/
+
+# node_modules in any directory (the earlier line groups several patterns and does not match)
+node_modules/
